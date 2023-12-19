@@ -1,5 +1,4 @@
 import CitronLexerModule
-import Utils
 
 extension Collection {
   var onlyElement: Element? {

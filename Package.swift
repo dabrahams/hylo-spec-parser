@@ -1,4 +1,4 @@
-// swift-tools-version:5.6
+// swift-tools-version:5.9
 import PackageDescription
 
 let CitronParser
@@ -9,15 +9,7 @@ let CitronLexer
 let package = Package(
   name: "Val",
 
-  products: [
-    .executable(name: "val", targets: ["CLI"]),
-  ],
-
   dependencies: [
-    .package(
-      url: "https://github.com/apple/swift-argument-parser.git",
-      from: "0.4.0"),
-
     .package(
       url: "https://github.com/loftware/Zip2Collection.git",
       from: "0.1.0"
@@ -33,18 +25,6 @@ let package = Package(
   ],
 
   targets: [
-    // The compiler's executable target.
-    .executableTarget(
-      name: "CLI",
-      dependencies: [
-        "Compiler",
-        .product(name: "ArgumentParser", package: "swift-argument-parser"),
-      ]),
-
-    // Targets related to the compiler's internal library.
-    .target(
-      name: "Compiler",
-      dependencies: ["Utils"]),
 
     .target(
       name: "Utils",
@@ -62,11 +42,6 @@ let package = Package(
       exclude: ["README.md"],
       plugins: [ .plugin(name: "CitronParserGenerator", package: "citron") ]
     ),
-
-    // Test targets.
-    .testTarget(
-      name: "ValTests",
-      dependencies: ["Compiler"]),
 
     .testTarget(
       name: "ParseGenTests",

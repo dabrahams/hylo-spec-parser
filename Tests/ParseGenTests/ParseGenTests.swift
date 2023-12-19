@@ -1,5 +1,4 @@
 import XCTest
-import Utils
 import Marpa
 import CitronLexerModule
 import CitronParserModule

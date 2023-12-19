@@ -1,4 +1,3 @@
-import Utils
 import CitronLexerModule
 
 let tokenID: [Character: EBNF.Token.ID] = [
