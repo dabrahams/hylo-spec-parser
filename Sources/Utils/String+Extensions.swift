@@ -24,14 +24,3 @@ extension StringProtocol {
   }
 }
 
-extension String {
-  /// Accesses the slice of `self` specified by the given range of UTF16
-  /// offsets.
-  fileprivate subscript(r: NSRange) -> Substring {
-    let start = utf16.index(
-      startIndex, offsetBy: r.location, limitedBy: endIndex) ?? endIndex
-    let end = utf16.index(start, offsetBy: r.length, limitedBy: endIndex)
-      ?? endIndex
-    return self[start..<end]
-  }
-}

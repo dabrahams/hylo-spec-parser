@@ -6,13 +6,6 @@ extension BidirectionalCollection {
   }
 }
 
-extension Collection {
-  /// Returns the descriptions of all elements, joined by the given `separator`.
-  public func descriptions(joinedBy separator: String = ", ") -> String {
-    self.lazy.map(String.init(describing:)).joined(separator: separator)
-  }
-}
-
 extension Swift.Collection {
   /// Returns the `SubSequence`s between pairs of elements bounded by an element
   /// satisfying `isOpenDelimiter` as an open deliminter and `isCloseDelimiter`
