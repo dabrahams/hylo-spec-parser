@@ -1,13 +1,17 @@
 import CitronLexerModule
 
 extension Collection {
+
+  /// The sole element, if `count == 1`, or `nil` otherwise.
   var onlyElement: Element? {
     return first.map { x in dropFirst().isEmpty ? x : nil } ?? nil
   }
+
 }
 
 /// Types that can be used to construct a BNF grammar from EBNF.
 protocol BNFBuilder {
+
   /// A symbol in the constructed BNF.
   associatedtype Symbol: Hashable
 
@@ -25,6 +29,7 @@ protocol BNFBuilder {
   /// Adds a BNF rule corresponding to `source`, reducing the elements of `rhs` to `lhs`.
   mutating func addRule<RHS: Collection, Source: EBNFNode>(
     reducing rhs: RHS, to lhs: Symbol, source: Source) where RHS.Element == Symbol
+
 }
 
 internal struct EBNFToBNF<BNF: BNFBuilder> {

@@ -2,9 +2,13 @@ import CitronLexerModule
 
 /// An error produced at compile-time.
 struct EBNFError: Error, Hashable {
+
+
   /// An additional informative note to go with the error message.
   struct Note: Hashable {
+    /// The human readable text.
     var message: String
+    /// The relevant region of source.
     let site: SourceRegion
   }
 
@@ -27,9 +31,11 @@ struct EBNFError: Error, Hashable {
     && l.notes.lazy.map(\.message) == r.notes.lazy.map(\.message)
       && l.notes.lazy.map(\.site) == r.notes.lazy.map(\.site)
   }
+
 }
 
 extension EBNFError: CustomStringConvertible {
+
   /// String representation that, if printed at the beginning of the line,
   /// should be recognized by IDEs.
   var description: String {
@@ -38,9 +44,11 @@ extension EBNFError: CustomStringConvertible {
         (i, n) in "\(n.site): note(\(i)): \(n.message)"
       }).joined(separator: "\n")
   }
+
 }
 
 extension SourcePosition {
+
   typealias Offset = (line: Int, column: Int)
 
   /// Returns `l` offset by `r`
