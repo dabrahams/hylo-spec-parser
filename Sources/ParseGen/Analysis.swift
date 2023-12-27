@@ -1,6 +1,5 @@
 import CitronLexerModule
 import Foundation
-import Marpa
 
 extension EBNF.Grammar {
   private typealias Symbol = EBNF.Symbol
