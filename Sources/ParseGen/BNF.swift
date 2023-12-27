@@ -1,6 +1,7 @@
 import CitronLexerModule
 
 extension Collection {
+  /// The sole element, if `count == 1`; otherwise `nil`.
   var onlyElement: Element? {
     return first.map { x in dropFirst().isEmpty ? x : nil } ?? nil
   }
@@ -22,7 +23,8 @@ protocol BNFBuilder {
   /// Sets the BNF grammar's start symbol.
   mutating func setStartSymbol(_: Symbol)
 
-  /// Adds a BNF rule corresponding to `source`, reducing the elements of `rhs` to `lhs`.
+  /// Adds a BNF rule corresponding to `source`, reducing the elements of `rhs` to the nonterminal
+  /// symbol `lhs`.
   mutating func addRule<RHS: Collection, Source: EBNFNode>(
     reducing rhs: RHS, to lhs: Symbol, source: Source) where RHS.Element == Symbol
 }
