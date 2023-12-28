@@ -1,4 +1,5 @@
 import Marpa
+import ParseGen
 import CitronLexerModule
 
 struct MarpaGrammarBuilder: BNFBuilder {

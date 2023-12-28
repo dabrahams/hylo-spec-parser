@@ -1,10 +1,12 @@
 extension EBNF {
-  struct Grammar {
-    let definitions: [Definition]
-    let definitionsByLHS: [EBNF.Symbol: Definition]
-    let start: Symbol
-    let whitespace: Symbol
+
+  public struct Grammar {
+    public let definitions: [Definition]
+    public let definitionsByLHS: [EBNF.Symbol: Definition]
+    public let start: Symbol
+    public let whitespace: Symbol
   }
+
 }
 
 extension EBNF.Grammar {
@@ -15,7 +17,7 @@ extension EBNF.Grammar {
       errors.insert(
         EBNF.Error(
         "Duplicate symbol definition", at: b.position,
-        notes: [.init(message: "First definition", site: a.position)]))
+        notes: [.init("First definition", site: a.position)]))
       return a
     }
 

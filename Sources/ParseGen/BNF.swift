@@ -8,7 +8,7 @@ extension Collection {
 }
 
 /// Types that can be used to construct a BNF grammar from EBNF.
-protocol BNFBuilder {
+public protocol BNFBuilder {
   /// A symbol in the constructed BNF.
   associatedtype Symbol: Hashable
 
@@ -29,7 +29,7 @@ protocol BNFBuilder {
     reducing rhs: RHS, to lhs: Symbol, source: Source) where RHS.Element == Symbol
 }
 
-internal struct EBNFToBNF<BNF: BNFBuilder> {
+public struct EBNFToBNF<BNF: BNFBuilder> {
 
   public private(set) var output: BNF
   private let input: EBNF.Grammar
@@ -45,7 +45,8 @@ internal struct EBNFToBNF<BNF: BNFBuilder> {
     inputNonterminals = input.nonterminals()
   }
 
-  public func asBNF(_ s: EBNF.Symbol) -> BNF.Symbol {
+  public func
+    asBNF(_ s: EBNF.Symbol) -> BNF.Symbol {
     bnfSymbol[.symbol(s)]!
   }
 
@@ -57,7 +58,7 @@ internal struct EBNFToBNF<BNF: BNFBuilder> {
     demandBNFSymbol(.symbol(s))
   }
 
-  mutating func build() {
+  public mutating func build() {
     for d in input.definitions {
       if inputNonterminals.contains(d.lhs) {
         for a in d.alternatives {

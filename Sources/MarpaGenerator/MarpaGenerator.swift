@@ -1,7 +1,8 @@
-import CitronLexerModule
 import Marpa
+import ParseGen
+import CitronLexerModule
 
-func makeParser(_ sourceGrammar: EBNF.Grammar) throws -> Parser {
+public func makeMarpaParser(_ sourceGrammar: EBNF.Grammar) throws -> MarpaParser {
   var bnfizer = EBNFToBNF(from: sourceGrammar, into: MarpaGrammarBuilder())
   bnfizer.build()
   let g = bnfizer.output.result
@@ -44,7 +45,7 @@ func makeParser(_ sourceGrammar: EBNF.Grammar) throws -> Parser {
       (pattern, Optional(bnfizer.asBNF(s)))
     })
 
-  return Parser(
+  return MarpaParser(
     grammar: g, unrecognizedToken: unrecognizedToken,
     scanner: Scanner(literalStrings: literals, patterns: tokenPatterns),
     symbolName: name,

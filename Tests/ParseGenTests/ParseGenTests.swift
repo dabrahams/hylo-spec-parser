@@ -1,6 +1,7 @@
 import XCTest
 import CitronLexerModule
 import CitronParserModule
+import MarpaGenerator
 
 @testable import ParseGen
 
@@ -104,7 +105,7 @@ final class ParseGenTests: XCTestCase {
       let valBlocks = specContents.markdownCodeBlocks(language: "val")
       var errors: EBNFErrorLog = []
       for b in valBlocks {
-        let valParser = try makeParser(g)
+        let valParser = try makeMarpaParser(g)
         let blockStart = (line: b.first!.0, column: 0)
         let text = specContents[b.first!.1.startIndex..<b.last!.1.endIndex]
         errors.formUnion(valParser.recognize(text, startingAt: blockStart, inFile: specPath))

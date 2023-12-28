@@ -1,7 +1,7 @@
 import CitronLexerModule
 import Utils
 
-enum EBNF {
+public enum EBNF {
   typealias Error = EBNFError
 
   struct Token: Equatable {
@@ -20,7 +20,7 @@ enum EBNF {
     var position: SourceRegion { position_.value }
   }
 
-  struct Symbol: EBNFNode {
+  public struct Symbol: EBNFNode {
     init(_ t: Token) {
       precondition(t.id == .SYMBOL_NAME || t.id == .LHS)
       self.init(t.text, at: t.position)
@@ -32,29 +32,30 @@ enum EBNF {
 
     let name: String
     let position_: Incidental<SourceRegion>
-    var position: SourceRegion { position_.value }
+    public var position: SourceRegion { position_.value }
 
-    func dumped(level: Int) -> String { name }
+    public func dumped(level: Int) -> String { name }
     /// A possible generated symbol name for this node in a BNF grammar
-    var bnfSymbolName: String { name }
+    public var bnfSymbolName: String { name }
   }
 
-  typealias DefinitionList = [Definition]
-  struct Definition: EBNFNode {
+  public typealias DefinitionList = [Definition]
+
+  public struct Definition: EBNFNode {
     enum Kind { case plain, token, oneOf, regexp, noNewline, noImplicitWhitespace }
     let kind: Kind
     let lhs: Symbol
     let alternatives: AlternativeList
 
     /// A possible generated symbol name for this node in a BNF grammar
-    var bnfSymbolName: String { dump }
+    public var bnfSymbolName: String { dump }
   }
 
-  typealias AlternativeList = [Alternative]
-  typealias Alternative = TermList
-  typealias TermList = [Term]
+  public typealias AlternativeList = [Alternative]
+  public typealias Alternative = TermList
+  public typealias TermList = [Term]
 
-  enum Term: EBNFNode {
+  public enum Term: EBNFNode {
     case group(AlternativeList)
     case symbol(Symbol)
     case literal(String, position: Incidental<SourceRegion>)
@@ -64,21 +65,25 @@ enum EBNF {
 }
 
 extension EBNF.Token: CustomStringConvertible {
-  var description: String {
+
+  public var description: String {
     "Token(.\(id), \(String(reflecting: text)), at: \(String(reflecting: position)))"
   }
+
 }
 
 extension EBNF.Symbol: CustomStringConvertible {
-  var description: String {
+
+  public var description: String {
     "Symbol(\(String(reflecting: name)), at: \(String(reflecting: position)))"
   }
+
 }
 
 
 
-/// An EBNFNode node.
-protocol EBNFNode: Hashable {
+/// A node in the AST of an EBNF grammar description.
+public protocol EBNFNode: Hashable {
   /// The region of source parsed as this node.
   var position: SourceRegion { get }
 
@@ -96,11 +101,12 @@ extension EBNFNode {
 }
 
 extension Array: EBNFNode where Element: EBNFNode {
-  var position: SourceRegion {
+
+  public var position: SourceRegion {
     first != nil ? first!.position...last!.position : .empty
   }
 
-  func dumped(level: Int) -> String {
+  public func dumped(level: Int) -> String {
     self.lazy.map { $0.dumped(level: level + 1) }
       .joined(separator: Self.dumpSeparator(level: level))
   }
@@ -112,22 +118,27 @@ extension Array: EBNFNode where Element: EBNFNode {
   }
 
   /// A possible generated symbol name for this node in a BNF grammar
-  var bnfSymbolName: String { dump }
+  public var bnfSymbolName: String { dump }
 }
 
 extension Optional: EBNFNode where Wrapped: EBNFNode {
-  var position: SourceRegion {
+
+  public var position: SourceRegion {
     self?.position ?? .empty
   }
-  func dumped(level: Int) -> String { self?.dumped(level: level + 1) ?? "" }
+
+  public func dumped(level: Int) -> String { self?.dumped(level: level + 1) ?? "" }
 
   /// A possible generated symbol name for this node in a BNF grammar
-  var bnfSymbolName: String { "`\(dump)`" }
+  public var bnfSymbolName: String { "`\(dump)`" }
+
 }
 
 extension EBNF.Definition {
-  var position: SourceRegion { lhs.position...alternatives.position }
-  func dumped(level: Int) -> String {
+
+  public var position: SourceRegion { lhs.position...alternatives.position }
+
+  public func dumped(level: Int) -> String {
     let k = [.oneOf: " (one of)", .token: " (token)", .regexp: " (regexp)"][kind]
 
     return """
@@ -136,9 +147,11 @@ extension EBNF.Definition {
       \(alternatives.dump)
     """
   }
+
 }
 
-extension EBNF.Term {
+public extension EBNF.Term {
+
   var position: SourceRegion {
     switch self {
     case .group(let g): return g.position
@@ -167,4 +180,5 @@ extension EBNF.Term {
     default: return "`\(s)`"
     }
   }
+
 }

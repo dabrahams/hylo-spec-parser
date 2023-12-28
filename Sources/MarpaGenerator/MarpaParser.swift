@@ -1,7 +1,8 @@
-import Marpa
 import CitronLexerModule
+import Marpa
+import ParseGen
 
-struct Parser {
+public struct MarpaParser {
   let grammar: Marpa.Grammar
   let recognizer: Marpa.Recognizer
   let unrecognizedToken: Marpa.Symbol
@@ -53,14 +54,14 @@ struct Parser {
     for (e, (t, s, position)) in tokens.enumerated() {
       r.append(
         EBNFError.Note(
-          message: "------------------- token \(e): '\(s)' (\(symbolName(t))) -------------------",
+          "------------------- token \(e): '\(s)' (\(symbolName(t))) -------------------",
           site: position + diagnosticOffset))
 
       r.append(
         contentsOf: recognizer.progress(at: EarleySet(id: UInt32(e)))
           .lazy.map { rule, origin, n in
             EBNFError.Note(
-              message: "\(description(rule, dotPosition: n)) (\(origin.id))",
+              "\(description(rule, dotPosition: n)) (\(origin.id))",
               site: ruleLocation(rule))
           })
     }
@@ -86,7 +87,7 @@ struct Parser {
     }
   }
 
-  func recognize(
+  public func recognize(
     _ text: Substring,
     startingAt diagnosticOffset: SourcePosition.Offset = (line: 0, column: 0),
     inFile sourceFile: String
@@ -115,7 +116,7 @@ struct Parser {
         errors.insert(
           EBNFError(
             "\(err) \(symbolName(t)): '\(s)'", at: esRegions.last!,
-            notes: [.init(message: "expected one of: " + expected, site: esRegions.last!)]))
+            notes: [.init("expected one of: " + expected, site: esRegions.last!)]))
 
       default:
         errors.insert(EBNFError("\(err)", at: esRegions.last!))
@@ -166,7 +167,7 @@ struct Parser {
       else {
         location = start...esRegions[Int(l.upperBound.id) - 1]
       }
-      notes.append(.init(message: "\t\(indent)\(description)", site: location))
+      notes.append(.init("\t\(indent)\(description)", site: location))
 
       for child in t.children {
         appendNotes(showing: child, to: &notes, depth: depth + 1)

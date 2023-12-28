@@ -95,7 +95,7 @@ extension EBNF.Grammar {
           Error(
             "Recursive token definition '\(stack[0].name)'", at: stack[0].position,
             notes: stack.dropFirst().map {
-              .init(message: "via: '\($0.name)'", site: $0.position)
+              .init("via: '\($0.name)'", site: $0.position)
             }))
       }
       else {
@@ -126,7 +126,7 @@ extension EBNF.Grammar {
   }
 
   /// Returns the set of literal strings recognized as terminals.
-  func literals() -> Set<String> {
+  public func literals() -> Set<String> {
     var visited: Set<String> = []
     var r: Set<String> = []
 
@@ -163,7 +163,7 @@ extension EBNF.Grammar {
   }
 
   /// Returns a mapping from terminal symbols to the regular expressions that describe them.
-  func regexps() -> [EBNF.Symbol: String] {
+  public func regexps() -> [EBNF.Symbol: String] {
     var visited: Set<Symbol> = []
     var r: [Symbol: String] = [:]
     visitSymbol(start)

@@ -33,9 +33,13 @@ let package = Package(
     ),
 
     .target(
+      name: "MarpaGenerator",
+      dependencies: [CitronLexer, "ParseGen", .product(name: "Marpa", package: "SwiftMarpa")]),
+
+    .target(
       name: "ParseGen",
       dependencies: [
-        "Utils", CitronParser, CitronLexer, .product(name: "Marpa", package: "SwiftMarpa"),
+        "Utils", CitronParser,
         .product(name: "LoftDataStructures_BitVector", package: "BitVector")
       ],
 
@@ -45,5 +49,5 @@ let package = Package(
 
     .testTarget(
       name: "ParseGenTests",
-      dependencies: ["ParseGen", "Utils"]),
+      dependencies: [CitronLexer, "ParseGen", "Utils", "MarpaGenerator"]),
   ])

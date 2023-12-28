@@ -1,46 +1,58 @@
 import CitronLexerModule
 
 /// An error produced at compile-time.
-struct EBNFError: Error, Hashable {
+public struct EBNFError: Error, Hashable {
+
   /// An additional informative note to go with the error message.
-  struct Note: Hashable {
-    var message: String
-    let site: SourceRegion
+  public struct Note: Hashable {
+
+    public var message: String
+    public let site: SourceRegion
+
+    public init(_ message: String, site: SourceRegion) {
+      self.message = message
+      self.site = site
+    }
+
   }
 
   /// A human-readable description of the problem.
-  let message: String
+  public let message: String
   /// Where to point in the source code
-  let site: SourceRegion
+  public let site: SourceRegion
   /// Any additional notes
-  let notes: [Note]
+  public let notes: [Note]
 
   /// Creates an instance with the given properties.
-  init(_ message: String, at site: SourceRegion, notes: [Note] = []) {
+  public init(_ message: String, at site: SourceRegion, notes: [Note] = []) {
     self.message = message
     self.site = site
     self.notes = notes
   }
 
-  static func == (l: Self, r: Self) -> Bool {
+  public static func == (l: Self, r: Self) -> Bool {
     l.message == r.message && l.site == r.site
     && l.notes.lazy.map(\.message) == r.notes.lazy.map(\.message)
       && l.notes.lazy.map(\.site) == r.notes.lazy.map(\.site)
   }
+
 }
 
 extension EBNFError: CustomStringConvertible {
+
   /// String representation that, if printed at the beginning of the line,
   /// should be recognized by IDEs.
-  var description: String {
+  public var description: String {
     return (
       ["\(site): error: \(message)"] + notes.enumerated().lazy.map {
         (i, n) in "\(n.site): note(\(i)): \(n.message)"
       }).joined(separator: "\n")
   }
+
 }
 
-extension SourcePosition {
+public extension SourcePosition {
+
   typealias Offset = (line: Int, column: Int)
 
   /// Returns `l` offset by `r`
@@ -55,7 +67,8 @@ extension SourcePosition {
 
 }
 
-extension SourceRegion {
+public extension SourceRegion {
+
   /// Returns `l` offset by `r`.
   static func + (l: Self, r: SourcePosition.Offset) -> Self {
     return .init(
@@ -67,28 +80,34 @@ extension SourceRegion {
     return .init(
       fileName: r.fileName, (r.span.lowerBound + l)..<(r.span.upperBound + l))
   }
+
 }
 
 extension EBNFError {
+
   /// Returns `l` offset by `r`.
   static func + (l: Self, r: SourcePosition.Offset) -> Self {
     Self(
       l.message, at: l.site + r,
-      notes: l.notes.map { .init(message: $0.message, site: $0.site + r) })
+      notes: l.notes.map { .init($0.message, site: $0.site + r) })
   }
 
   /// Returns `r` offset by `l`.
   static func + (l: SourcePosition.Offset, r: Self) -> Self {
     Self(
       r.message, at: r.site + l,
-      notes: r.notes.map { .init(message: $0.message, site: $0.site + l) })
+      notes: r.notes.map { .init($0.message, site: $0.site + l) })
   }
+
 }
 
-typealias EBNFErrorLog = Set<EBNFError>
+public typealias EBNFErrorLog = Set<EBNFError>
+
 extension EBNFErrorLog: Error {
+
   func report() -> String {
     self.sorted { $0.site.span.lowerBound < $1.site.span.lowerBound }
       .lazy.map { "\($0)" }.joined(separator: "\n")
   }
+
 }
