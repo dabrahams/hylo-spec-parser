@@ -33,32 +33,32 @@ public protocol BNFBuilder {
 
 }
 
-public struct EBNFToBNF<BNF: BNFBuilder> {
+public struct EBNFToBNF<Output: BNFBuilder> {
 
-  public private(set) var output: BNF
+  public private(set) var output: Output
   private let input: EBNF.Grammar
 
   /// The inputs's nonterminal symbols
   private let inputNonterminals: Set<EBNF.Symbol>
 
-  /// Mapping from pieces of EBNF AST to BNF symbol.
-  private var bnfSymbol: [EBNF.Term: BNF.Symbol] = [:]
+  /// Mapping from pieces of EBNF AST to Output symbol.
+  private var bnfSymbol: [EBNF.Term: Output.Symbol] = [:]
 
-  public init(from input: EBNF.Grammar, into output: BNF) {
+  public init(from input: EBNF.Grammar, into output: Output) {
     (self.input, self.output) = (input, output)
     inputNonterminals = input.nonterminals()
   }
 
   public func
-    asBNF(_ s: EBNF.Symbol) -> BNF.Symbol {
+    asBNF(_ s: EBNF.Symbol) -> Output.Symbol {
     bnfSymbol[.symbol(s)]!
   }
 
-  public func asBNF(literal l: String) -> BNF.Symbol {
+  public func asBNF(literal l: String) -> Output.Symbol {
     bnfSymbol[.literal(l, position: .init(.empty))]!
   }
 
-  private mutating func demandSymbol(_ s: EBNF.Symbol) -> BNF.Symbol {
+  private mutating func demandSymbol(_ s: EBNF.Symbol) -> Output.Symbol {
     demandBNFSymbol(.symbol(s))
   }
 
@@ -74,22 +74,22 @@ public struct EBNFToBNF<BNF: BNFBuilder> {
   }
 
   mutating func buildRule<RHS: Collection, Source: EBNFNode>(
-    reducing rhs: RHS, to lhs: BNF.Symbol, source: Source
+    reducing rhs: RHS, to lhs: Output.Symbol, source: Source
   ) where RHS.Element == EBNF.Term {
     buildRule(reducingBNF: rhs.map { t in demandBNFSymbol(t) }, to: lhs, source: source)
   }
 
   mutating func buildRule<RHS: Collection, Source: EBNFNode>(
-    reducingBNF rhs: RHS, to lhs: BNF.Symbol, source: Source
-  ) where RHS.Element == BNF.Symbol {
+    reducingBNF rhs: RHS, to lhs: Output.Symbol, source: Source
+  ) where RHS.Element == Output.Symbol {
     output.addRule(reducing: rhs, to: lhs, source: source)
   }
 
-  mutating func demandBNFSymbol(_ t: EBNF.Term) -> BNF.Symbol {
+  mutating func demandBNFSymbol(_ t: EBNF.Term) -> Output.Symbol {
     if let r = bnfSymbol[t] {
       return r
     }
-    let lhs: BNF.Symbol
+    let lhs: Output.Symbol
     defer { bnfSymbol[t] = lhs }
 
     switch t {
@@ -117,4 +117,5 @@ public struct EBNFToBNF<BNF: BNFBuilder> {
     }
     return lhs
   }
+
 }
