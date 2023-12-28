@@ -33,9 +33,15 @@ public protocol BNFBuilder {
 
 }
 
+/// State of the process of converting a Hylo EBNF grammar into an `Output` BNF grammar.
 public struct EBNFToBNF<Output: BNFBuilder> {
 
+  /// The target of the conversion.
+  ///
+  /// - Precondition for reading: `build()` has already been called.
   public private(set) var output: Output
+
+  /// The grammar to be converted.
   private let input: EBNF.Grammar
 
   /// The inputs's nonterminal symbols
@@ -44,24 +50,36 @@ public struct EBNFToBNF<Output: BNFBuilder> {
   /// Mapping from pieces of EBNF AST to Output symbol.
   private var bnfSymbol: [EBNF.Term: Output.Symbol] = [:]
 
+  /// An instance converting `input` into `output`.
+  ///
+  /// - Precondition: `output` is empty.
   public init(from input: EBNF.Grammar, into output: Output) {
     (self.input, self.output) = (input, output)
     inputNonterminals = input.nonterminals()
   }
 
-  public func
-    asBNF(_ s: EBNF.Symbol) -> Output.Symbol {
+  /// Returns the `output` symbol corresponding to `s`.
+  ///
+  /// - Precondition: `s` was used in the input grammar.
+  public func asBNF(_ s: EBNF.Symbol) -> Output.Symbol {
     bnfSymbol[.symbol(s)]!
   }
 
+  /// Returns the `output` symbol corresponding to `l`.
+  ///
+  /// - Precondition: `l` was used in the input grammar.
   public func asBNF(literal l: String) -> Output.Symbol {
     bnfSymbol[.literal(l, position: .init(.empty))]!
   }
 
+  /// Returns the `output` symbol corresponding to `s`, creating it if necessary.
   private mutating func demandSymbol(_ s: EBNF.Symbol) -> Output.Symbol {
     demandBNFSymbol(.symbol(s))
   }
 
+  /// Prepares `output` to be read.
+  ///
+  /// - Note: should only be called once.
   public mutating func build() {
     for d in input.definitions {
       if inputNonterminals.contains(d.lhs) {
@@ -73,22 +91,27 @@ public struct EBNFToBNF<Output: BNFBuilder> {
     output.setStartSymbol(demandSymbol(input.start))
   }
 
+  /// Updates `output` with the BNF rule(s) corresponding to a rule deriving the EBNF symbol corresponding
+  /// to `lhs` from `rhs`.
   mutating func buildRule<RHS: Collection, Source: EBNFNode>(
     reducing rhs: RHS, to lhs: Output.Symbol, source: Source
   ) where RHS.Element == EBNF.Term {
+
     buildRule(reducingBNF: rhs.map { t in demandBNFSymbol(t) }, to: lhs, source: source)
+
   }
 
+  /// Updates `output` with the BNF rule(s) deriving `lhs` from `rhs`.
   mutating func buildRule<RHS: Collection, Source: EBNFNode>(
     reducingBNF rhs: RHS, to lhs: Output.Symbol, source: Source
   ) where RHS.Element == Output.Symbol {
     output.addRule(reducing: rhs, to: lhs, source: source)
   }
 
+  /// Returns a BNF symbol corresponding to `t`, creating it in `output` if necessary.
   mutating func demandBNFSymbol(_ t: EBNF.Term) -> Output.Symbol {
-    if let r = bnfSymbol[t] {
-      return r
-    }
+    if let r = bnfSymbol[t] { return r }
+
     let lhs: Output.Symbol
     defer { bnfSymbol[t] = lhs }
 
