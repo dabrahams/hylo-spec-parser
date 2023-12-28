@@ -1,42 +1,67 @@
 import CitronLexerModule
 import Utils
 
+/// A Namespace for definitions related to our grammar specification syntax.
 public enum EBNF {
+
   typealias Error = EBNFError
 
+  /// A terminal such as `::=` in the grammar specification syntax.
   struct Token: Equatable {
+
+    /// The kind of token; all that matters to the EBNF syntax parser.
     typealias ID = EBNFParser.CitronTokenCode
 
+    /// Creates an instance with the given properties.
+    ///
+    /// - Note: the position of a token is not considered to be part of its value.
     init(_ id: ID, _ content: String, at position: SourceRegion) {
       self.id = id
       self.text = content
       self.position_ = .init(position)
     }
 
+    /// The kind of token; all that matters to the EBNF syntax parser.
     let id: ID
+
+    /// The source text of the token.
     let text: String
+
+    /// The position in the grammar source.
     let position_: Incidental<SourceRegion>
 
+    /// The position in the grammar source (incidental to the value).
     var position: SourceRegion { position_.value }
   }
 
+  /// A name in the grammar specification syntax.
   public struct Symbol: EBNFNode {
+
+    /// Creates an instance from `t`, which must have kind `.SYMBOL_NAME` or `.LHS`.
     init(_ t: Token) {
       precondition(t.id == .SYMBOL_NAME || t.id == .LHS)
       self.init(t.text, at: t.position)
     }
+
+    /// Creates an instance with the given properties
     init(_ content: String, at position: SourceRegion) {
       self.name = content
       self.position_ = .init(position)
     }
 
+    /// The text of the name.
     let name: String
+
+    /// The position in the grammar source.
     let position_: Incidental<SourceRegion>
+
+    /// The position in the grammar source (incidental to the value).
     public var position: SourceRegion { position_.value }
 
     public func dumped(level: Int) -> String { name }
     /// A possible generated symbol name for this node in a BNF grammar
     public var bnfSymbolName: String { name }
+
   }
 
   public typealias DefinitionList = [Definition]
