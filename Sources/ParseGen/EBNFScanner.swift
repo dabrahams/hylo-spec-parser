@@ -1,5 +1,7 @@
 import CitronLexerModule
 
+/// A mapping from single-character token representations to their ID as consumed by the Citron
+/// parser.
 let tokenID: [Character: EBNF.Token.ID] = [
   "*": .STAR,
   "+": .PLUS,
@@ -9,7 +11,10 @@ let tokenID: [Character: EBNF.Token.ID] = [
   "?": .QUESTION
 ]
 
-struct Input {
+/// The part of a grammar's textual representation yet to be processed, tracking its position in a
+/// source file.
+private struct Input {
+  /// The remaining text.
   var tail: Substring
   var currentLine: Int
   var column1: String.Index
