@@ -21,7 +21,7 @@ jobs:
     - name: Dependencies
       run: |
         brew unlink libmarpa > /dev/null 2>&1 || true
-        brew tap val-lang/homebrew-tap
+        brew tap hylo-lang/homebrew-tap
         brew install --HEAD libmarpa-val
     - name: Build
       run: swift build -v

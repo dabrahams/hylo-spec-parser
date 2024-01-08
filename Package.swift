@@ -7,7 +7,7 @@ let CitronLexer
   = Target.Dependency.product(  name: "CitronLexerModule", package: "citron")
 
 let package = Package(
-  name: "Val",
+  name: "HyloSpecParser",
 
   dependencies: [
     .package(

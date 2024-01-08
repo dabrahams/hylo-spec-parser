@@ -102,7 +102,7 @@ final class ParseGenTests: XCTestCase {
       let specContents = try String(contentsOfFile: specPath, encoding: .utf8)
       let g = try specContents.asEBNFGrammar()
 
-      let valBlocks = specContents.markdownCodeBlocks(language: "val")
+      let valBlocks = specContents.markdownCodeBlocks(language: "hylo")
       var errors: EBNFErrorLog = []
       for b in valBlocks {
         let valParser = try makeMarpaParser(g)

@@ -12,5 +12,5 @@
 /antlr4
 
 /Sources/Parser/**
-!/Sources/Parser/Val.g4
+!/Sources/Parser/Hylo.g4
 !/Sources/Parser/ValParser+Extensions.swift
