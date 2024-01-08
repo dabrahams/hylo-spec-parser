@@ -62,10 +62,83 @@ public enum EBNF {
 
   }
 
+  /// The AST representation of a list of EBNF rules.
+  ///
+  /// Corresponds to `rule_list` in the EBNF grammar syntax.
   public typealias DefinitionList = [Definition]
 
+  /// The AST representation of an EBNF rule.
+  ///
+  /// Corresponds to `rule` in the EBNF grammar syntax.
   public struct Definition: EBNFNode {
-    enum Kind { case plain, token, oneOf, regexp, noNewline, noImplicitWhitespace }
+
+    /// How the particular rule is to be interpreted.
+    enum Kind {
+
+      /// A traditional EBNF rule with no special interpretation applied.
+      case plain
+
+      /// A nonrecursive rule that describes (part of) a terminal symbol.
+      ///
+      /// Whitespace is not implicitly recognized between elements of a `(token)` rule.
+      ///
+      /// - For example:
+      ///   ```
+      ///   octal-literal ::= (token)
+      ///     '0o' octal-digit+
+      ///   ```
+      ///   In this case, `octal-digit` might itself be a `(token)` rule.
+      case token
+
+      /// A rule that recognizes one of a fixed number of literal strings.
+      /// Whitespace is not implicitly recognized between elements of a `(token)` rule.
+      ///
+      /// - For example:
+      ///   ```
+      ///   method-introducer ::= (one of)
+      ///     let sink inout
+      ///   ```
+      case oneOf
+
+      /// A rule that recognizes strings matching an [ICU regular
+      /// expression](https://unicode-org.github.io/icu/userguide/strings/regexp.html).
+      ///
+      /// - For example:
+      ///   ```
+      ///   bq-char ::= (regexp)
+      ///     [^`\x0a\x0d]
+      ///   ```
+      case regexp
+
+      /// A traditional EBNF rule, except that if there is a newline between RHS elements of any
+      /// top-level alternative, recognition fails.
+      ///
+      /// - For example:
+      ///   ```
+      ///   inout-expr ::= (no-newline)
+      ///     '&' expr
+      ///   ```
+      ///   In this case, horizontal whitespace would be allowed between the ampersand and the
+      ///   string matching `expr`, but no vertical whitespace.
+      case noNewline
+
+      /// A traditional EBNF rule, except that implicit whitespace skipping is disabled between RHS
+      /// elements of any top-level alternative
+      ///
+      /// - For example:
+      ///   ```
+      ///   inout-expr ::= (no-implicit-whitespace)
+      ///     '&' horizontal-space? expr
+      ///
+      ///   horizontal-space ::= (regexp)
+      ///     \h
+      ///   ```
+      ///   In this case, horizontal whitespace matching the given regular expression would be
+      ///   allowed between the ampersand and the string matching `expr`, but no other whitespace
+      ///   would be recognized there.
+      case noImplicitWhitespace
+    }
+
     let kind: Kind
     let lhs: Symbol
     let alternatives: AlternativeList
