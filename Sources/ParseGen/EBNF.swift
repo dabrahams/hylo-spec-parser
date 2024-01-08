@@ -139,8 +139,13 @@ public enum EBNF {
       case noImplicitWhitespace
     }
 
+    /// How this rule should be interpreted.
     let kind: Kind
+
+    /// The symbol recognized by this compound rule.
     let lhs: Symbol
+
+    /// The list of right-hand-side alternatives that derive `lhs`.
     let alternatives: AlternativeList
 
     /// A possible generated symbol name for this node in a BNF grammar
