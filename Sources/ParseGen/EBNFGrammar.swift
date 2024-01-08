@@ -4,7 +4,6 @@ extension EBNF {
     public let definitions: [Definition]
     public let definitionsByLHS: [EBNF.Symbol: Definition]
     public let start: Symbol
-    public let whitespace: Symbol
   }
 
 }
@@ -28,7 +27,6 @@ extension EBNF.Grammar {
       throw errors
     }
     start = try lhsSymbol(startName)
-    whitespace = try lhsSymbol("whitespace")
 
     checkAllSymbolsDefined(into: &errors)
     checkAllSymbolsReachable(into: &errors)
