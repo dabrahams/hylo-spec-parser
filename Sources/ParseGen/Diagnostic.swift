@@ -1,14 +1,18 @@
 import CitronLexerModule
 
-/// An error produced at compile-time.
+/// An error produced when compiling a grammar.
 public struct EBNFError: Error, Hashable {
 
   /// An additional informative note to go with the error message.
   public struct Note: Hashable {
 
+    /// The text of the note
     public var message: String
+
+    /// Where to point in the source code.
     public let site: SourceRegion
 
+    /// Creates an instance with the given properties.
     public init(_ message: String, site: SourceRegion) {
       self.message = message
       self.site = site
@@ -105,6 +109,11 @@ public typealias EBNFErrorLog = Set<EBNFError>
 
 extension EBNFErrorLog: Error {
 
+  // Note: the following method is not simply `description` because Set already has a
+  // `CustomStringConvertible` conformance that can't be overridden.  Perhaps make `EBNFErrorlog` a
+  // wrapper around a `Set` to solve that.
+
+  /// Returns a string representation suitable for display in an IDE.
   func report() -> String {
     self.sorted { $0.site.span.lowerBound < $1.site.span.lowerBound }
       .lazy.map { "\($0)" }.joined(separator: "\n")
