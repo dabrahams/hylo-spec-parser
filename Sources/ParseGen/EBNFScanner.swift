@@ -11,35 +11,44 @@ let tokenID: [Character: EBNF.Token.ID] = [
   "?": .QUESTION
 ]
 
-/// The part of a grammar's textual representation yet to be processed, tracking its position in a
-/// source file.
+/// The textual input stream, tracking its position in a source file.
 private struct Input {
-  /// The remaining text.
+
+  /// The remaining text to be tokenized.
   var tail: Substring
+
+  /// The source line number of the start of `tail`.
   var currentLine: Int
+
+  /// The position of the first character (in the whole input) on `currentLine`.
   var column1: String.Index
 
-
+  /// An instance for tokenizing `text` starting on `startLine` of a source file.
   init(_ text: Substring, onLine startLine: Int) {
     column1 = text.startIndex
     currentLine = startLine
     tail = text
   }
 
+  /// Consumes any leading whitespace.
   mutating func skipWhitespace() {
     while !tail.isEmpty && tail.first!.isWhitespace { popFirst() }
   }
 
+  /// Consumes any leading whitespace that is not a newline.
   mutating func skipHorizontalSpace() {
     tail = tail.drop { c in c.isWhitespace && !c.isNewline }
   }
 
+  /// Consumes and returns leading non-whitespace, or returns `nil` if there is no leading
+  /// whitespace.
   mutating func eatNonWhitespace() -> Substring? {
     let h = tail
     tail = tail.drop { !$0.isWhitespace }
     return h.startIndex == tail.startIndex ? nil : h[..<tail.startIndex]
   }
 
+  /// Consumes and returns a leading symbol name, or returns `nil` if there is no leading symbol.
   mutating func eatSymbolName() -> Substring? {
     guard let c = tail.first, c.isLetter else { return nil }
     let h = tail
@@ -47,6 +56,8 @@ private struct Input {
     return h[..<tail.startIndex]
   }
 
+  /// Consumes and returns the text of a leading quoted literal, or returns `nil` if there is no
+  /// leading quoted literal.
   mutating func eatQuotedLiteral() -> Substring? {
     guard let c = tail.first, c == "'" else { return nil }
     var s = self
@@ -60,6 +71,8 @@ private struct Input {
     return tail[..<s.tail.startIndex]
   }
 
+  /// Consumes and returns leading text identical to `target`, or returns `nil` if no such leading
+  /// text exists.
   mutating func eat(_ target: String) -> Substring? {
     var t = target[...]
     var s = self
@@ -72,12 +85,14 @@ private struct Input {
     return tail[..<s.tail.startIndex]
   }
 
-  mutating func eatLine() -> Substring {
+  /// Consumes and returns the leading non-newline text (or returns "" if there is none).
+  mutating func eatRestOfLine() -> Substring {
     let h = tail
     tail = tail.drop { !$0.isNewline }
     return h[..<tail.startIndex]
   }
 
+  /// Consumes and returns the next character, or returns nil if there is no next character.
   @discardableResult
   mutating func popFirst() -> Character? {
     guard let r = tail.popFirst() else { return nil }
@@ -88,14 +103,19 @@ private struct Input {
     return r
   }
 
+  /// True iff all the text was consumed.
   var isEmpty: Bool { tail.isEmpty }
 
+  /// The next character, or `nil` if there is no next character.
   var first: Character? { tail.first }
 
+  /// True iff the next character is a newline.
   var atEOL: Bool { isEmpty || tail.first!.isNewline }
 }
 
 extension EBNF {
+
+  /// Returns the EBNF tokens for `sourceText`, starting on `startLine` of the file at `sourcePath`.
   static func tokens(
     in sourceText: Substring, onLine startLine: Int, fromFile sourcePath: String
   ) -> [Token] {
@@ -187,7 +207,7 @@ extension EBNF {
           }
 
         case .regexp:
-          let l = input.eatLine()
+          let l = input.eatRestOfLine()
           token(.REGEXP, l.strippingWhitespace())
         }
         if currentDefinitionKind == .oneOf { input.popFirst() }
@@ -199,4 +219,5 @@ extension EBNF {
 
     return output
   }
+
 }
