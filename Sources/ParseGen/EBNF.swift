@@ -152,15 +152,41 @@ public enum EBNF {
     public var bnfSymbolName: String { dump }
   }
 
+  /// The AST representation of a list of EBNF rule RHS alternatives.
+  ///
+  /// Corresponds to `alt_list` in the EBNF grammar syntax.
   public typealias AlternativeList = [Alternative]
+
+  /// The AST representation of an EBNF rule top-level RHS alternative.
+  ///
+  /// Corresponds to `alt` in the EBNF grammar syntax.
   public typealias Alternative = TermList
+
+  /// The AST representation of an EBNF rule RHS alternative.
+  ///
+  /// Corresponds to `term_list` in the EBNF grammar syntax.
   public typealias TermList = [Term]
 
+  /// The AST representation of an element of an EBNF rule RHS alternative.
+  ///
+  /// Corresponds to `term` in the EBNF grammar syntax.
   public enum Term: EBNFNode {
+
+    /// A parenthesized group.
     case group(AlternativeList)
+
+    /// A bare grammar symbol.
     case symbol(Symbol)
+
+    /// A literal string to be recognized (found at `position` in the grammar source).
     case literal(String, position: Incidental<SourceRegion>)
+
+    /// An [ICU regular expression](https://unicode-org.github.io/icu/userguide/strings/regexp.html)
+    /// to be matched, (found at `position` in the grammar source).
     case regexp(String, position: Incidental<SourceRegion>)
+
+    /// A term decorated with a `*`, `+`, or `?` quantifier, (found at `position` in the grammar
+    /// source).
     indirect case quantified(Term, Character, position: Incidental<SourceRegion>)
   }
 }
@@ -197,10 +223,13 @@ public protocol EBNFNode: Hashable {
 }
 
 extension EBNFNode {
+
   /// A string representation in the original syntax.
   var dump: String { self.dumped(level: 0) }
+
 }
 
+/// An array of `EBNFNode`s can itself be used as an `EBNFNode`.
 extension Array: EBNFNode where Element: EBNFNode {
 
   public var position: SourceRegion {
@@ -212,16 +241,19 @@ extension Array: EBNFNode where Element: EBNFNode {
       .joined(separator: Self.dumpSeparator(level: level))
   }
 
-  static func dumpSeparator(level: Int) -> String {
-    return Element.self == EBNF.Definition.self ? "\n\n"
-      : Element.self == EBNF.Alternative.self ? (level == 0 ? "\n  " : " | ")
-      : " "
+  /// Returns the dump text that appears between element dumps.
+  private static func dumpSeparator(level: Int) -> String {
+    return Element.self == EBNF.Definition.self ? "\n\n" // top level definitions
+      : Element.self == EBNF.Alternative.self ? (level == 0 ? "\n  " : " | ") // alternatives
+      : " " // terms
   }
 
   /// A possible generated symbol name for this node in a BNF grammar
   public var bnfSymbolName: String { dump }
 }
 
+/// An optional `EBNFNode` can itself be used as an `EBNFNode` (representing quantification with
+/// `?`).
 extension Optional: EBNFNode where Wrapped: EBNFNode {
 
   public var position: SourceRegion {
