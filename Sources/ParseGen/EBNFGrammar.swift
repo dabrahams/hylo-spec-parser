@@ -15,7 +15,7 @@ extension EBNF.Grammar {
     definitions = ast
     definitionsByLHS = Dictionary(ast.lazy.map {(key: $0.lhs, value: $0)}) { a, b in
       errors.insert(
-        EBNF.Error(
+        EBNFError(
         "Duplicate symbol definition", at: b.position,
         notes: [.init("First definition", site: a.position)]))
       return a
@@ -24,7 +24,7 @@ extension EBNF.Grammar {
     let lhsSymbol: (_: String) throws -> EBNF.Symbol = { [definitionsByLHS] name in
       if let x = definitionsByLHS[.init(name, at: .empty)] { return x.lhs }
       errors.insert(
-        EBNF.Error("Symbol \(name) not defined\n\(ast)", at: ast.position))
+        EBNFError("Symbol \(name) not defined\n\(ast)", at: ast.position))
       throw errors
     }
     start = try lhsSymbol(startName)

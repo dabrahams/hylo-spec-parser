@@ -4,8 +4,6 @@ import Utils
 /// A Namespace for definitions related to our grammar specification syntax.
 public enum EBNF {
 
-  typealias Error = EBNFError
-
   /// A terminal such as `::=` in the grammar specification syntax.
   struct Token: Equatable {
 

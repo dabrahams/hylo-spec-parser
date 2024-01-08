@@ -3,7 +3,7 @@ import Foundation
 
 extension EBNF.Grammar {
   private typealias Symbol = EBNF.Symbol
-  private typealias Error = EBNF.Error
+  private typealias Error = EBNFError
   private typealias Alternative = EBNF.Alternative
   private typealias AlternativeList = EBNF.AlternativeList
   private typealias Term = EBNF.Term
