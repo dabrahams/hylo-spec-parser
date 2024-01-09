@@ -2,6 +2,7 @@ import Marpa
 import ParseGen
 import CitronLexerModule
 
+/// Returns a parser for `sourceGrammar`.
 public func makeMarpaParser(_ sourceGrammar: EBNF.Grammar) throws -> MarpaParser {
   var bnfizer = EBNFToBNF(from: sourceGrammar, into: MarpaGrammarBuilder())
   bnfizer.build()
@@ -25,10 +26,14 @@ public func makeMarpaParser(_ sourceGrammar: EBNF.Grammar) throws -> MarpaParser
     throw errors
   }
 
+  /// Returns the location of the EBNF fragment that generated `r`.
   func location(_ r: Marpa.Rule) -> SourceRegion { bnfizer.output.ruleSource[r]! }
 
+  /// Returns the name of the EBNF symbol corresponding to `s` (or to a synthesized name if `s` was
+  /// synthesized in EBNF-to-BNF conversion).
   func name(_ s: Marpa.Symbol) -> String { bnfizer.output.symbolSource[s]!.name }
 
+  /// Returns a textual description of `r`.
   func description(_ r: Marpa.Rule) -> String {
     let lhsName = name(g.lhs(r))
     let rhs = g.rhs(r).lazy.map { s in name(s) }.joined(separator: " ")
