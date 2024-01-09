@@ -2,14 +2,29 @@ import CitronLexerModule
 import Marpa
 import ParseGen
 
+/// A parser implemented by using Marpa for a language described by an EBNF grammar.
 public struct MarpaParser {
+
+  /// Marpa's representation of an equivalent BNF grammar to the EBNF grammar being recognized.
   let grammar: Marpa.Grammar
+
+  /// The base Marpa parser, built from `grammar`.
   let recognizer: Marpa.Recognizer
+
+  /// A symbol outside the input grammar that is generated when no other token can be recognized.
   let unrecognizedToken: Marpa.Symbol
-  let scanner: Scanner<Marpa.Symbol>
+
+  /// A recognizer for the tokens of the input grammar.
+  let scanner: CitronLexerModule.Scanner<Marpa.Symbol>
+
+  /// A mapping from Marpa `Symbol` to a name from the input grammar (or to a synthesized name if
+  /// the symbol was synthesized in EBNF-to-BNF conversion).
   let symbolName: (Marpa.Symbol) -> String
+
+  /// A mapping from Marp `Rule` to a corresponding source region in the input EBNF grammar.
   let ruleLocation: (Marpa.Rule) -> SourceRegion
 
+  /// Creates an instance with the given property values.
   init(
     grammar: Marpa.Grammar,
     unrecognizedToken: Marpa.Symbol,
@@ -22,12 +37,17 @@ public struct MarpaParser {
     recognizer = Recognizer(grammar)
   }
 
+  /// Prints the Marpa grammar with its parts mapped to the EBNF source that generated them.
+  ///
+  /// The output format complies with the GNU diagnostic standard.
   func dumpGrammar() {
     for r in grammar.rules {
       print("\(ruleLocation(r)): note:", description(r))
     }
   }
 
+  /// Returns a human-readable description of `r` (with a dot marker before the `nth` RHS symbol if
+  /// `dotPosition != nil`).
   func description(_ r: Marpa.Rule, dotPosition: Int? = nil) -> String {
     let lhsName = symbolName(grammar.lhs(r))
     let rhsNames = grammar.rhs(r).lazy.map { s in symbolName(s) }
@@ -38,6 +58,10 @@ public struct MarpaParser {
     return "\(lhsName) -> \(dottedRHS.joined(separator: " "))"
   }
 
+  /// Returns diagnostic notes describing the parser's state at each position in `text`, which was
+  /// extracted from `sourceFile` starting at `startPosition`.
+  ///
+  /// - Precondition: `recognize` was already called on `text`.
   func progressReport(
     text: Substring,
     startingAt startPosition: SourcePosition = .init(line: 1, column: 1),
@@ -68,28 +92,45 @@ public struct MarpaParser {
     return r
   }
 
+  /// A parse tree resulting from a successful recognition.
   struct Tree {
+    /// The Marpa bottom-up `.rule` evaluation step that produces this node from its children.
     let step: Evaluation.Step
+
+    /// The child nodes.
     let children: [Tree]
 
     init(_ e: Evaluation) {
+      // While Marpa calls this thing a stack, it's really used like an array and the docs don't say
+      // how indices are allocated, so we'll use a dictionary instead to be safe.
       var stack: [UInt32: Tree] = [:]
-      for step in e {
-        let children: [Tree] = step.rule.map { r in r.input.map { i in stack[i]! } } ?? []
-        stack[step.output] = Tree(step: step, children: children)
+
+      for s in e {
+        // If it's a `.rule` step, it's telling us where in the stack to find the children of a
+        // node we'll create as part of this evaluation step
+        let children: [Tree] = s.rule.map {
+          r in r.input.map { i in stack[i]! }
+        } ?? []
+        // Create the new tree node.
+        stack[s.output] = Tree(step: s, children: children)
       }
+
+      // The final reduction always goes into the zeroth element.
       self = stack[0]!
     }
 
-    init(step: Evaluation.Step, children: [Tree]) {
+    /// An instance with the given properties.
+    private init(step: Evaluation.Step, children: [Tree]) {
       self.step = step
       self.children = children
     }
   }
 
+  /// Returns diagnostic notes describing any errors, and if the parse was successful, the parse
+  /// trees derived from `text`, which was extracted from `sourceFile` starting at `startPosition`.
   public func recognize(
     _ text: Substring,
-    startingAt diagnosticOffset: SourcePosition.Offset = (line: 0, column: 0),
+    startingAt startPosition: SourcePosition.Offset = (line: 0, column: 0),
     inFile sourceFile: String
   ) -> EBNFErrorLog {
     var errors: EBNFErrorLog = []
@@ -101,7 +142,7 @@ public struct MarpaParser {
 
     var esRegions: [SourceRegion] = []
     for (t, s, p) in tokens {
-      esRegions.append(p + diagnosticOffset)
+      esRegions.append(p + startPosition)
 
       guard let err = recognizer.read(t) else {
         recognizer.advanceEarleme()
