@@ -2,12 +2,15 @@
 import ParseGen
 import XCTest
 
+/// The EBNF source code for a grammar.
+typealias GrammarSource = (text: Substring, sourceFilePath: String, startLine: Int)
+
 /// Called with a multiline string immediately following the open parenthesis (`source("""`),
 /// returns that string (sliced), the path to the file in which the string appears, and the line
 /// number of the string's first character.
 func source(
   _ text: String, sourceFilePath: String = #filePath, startLine: Int = #line
-) -> (text: Substring, sourceFilePath: String, startLine: Int) {
+) -> GrammarSource {
   (text[...], sourceFilePath, startLine + 1)
 }
 

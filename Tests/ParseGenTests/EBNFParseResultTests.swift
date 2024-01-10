@@ -27,16 +27,20 @@ f ::= (no-newline)
   f g
 """)
 
+func ebnf(_ source: GrammarSource) throws -> EBNF.DefinitionList {
+  let p = EBNFParser()
+  for t in EBNF.tokens(
+        in: source.text, onLine: source.startLine, fromFile: source.sourceFilePath)
+  {
+    try p.consume(token: t, code: t.id)
+  }
+  return try p.endParsing()
+}
+
 final class EBNFParseResultTests: XCTestCase {
 
   func test() throws {
-    let p = EBNFParser()
-    for t in EBNF.tokens(
-          in: sample.text, onLine: sample.startLine, fromFile: sample.sourceFilePath)
-    {
-      try p.consume(token: t, code: t.id)
-    }
-    let ast = try p.endParsing()
+    let ast = try ebnf(sample)
 
     // A dummy source location (they are incidental to AST values)
     let l = SourceRegion.init(
