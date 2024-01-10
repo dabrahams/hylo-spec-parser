@@ -2,13 +2,26 @@ import XCTest
 import CitronLexerModule
 @testable import ParseGen
 
-private struct TestBuilder: BNFBuilder {
+private struct TestBuilder {
   typealias Symbol = Int
   var symbolName: [String] = []
   var symbolLocation: [SourceRegion] = []
   var rules: [(lhs: Symbol, rhs: [Symbol])] = []
   var ruleLocation: [SourceRegion] = []
   var startSymbol: Symbol?
+
+  func ruleSpelling(_ i: Int) -> String {
+    let rhs = rules[i].rhs.map { symbolName[$0] }.joined(separator: " ")
+    return "\(symbolName[rules[i].lhs]) ::= \(rhs)"
+  }
+
+  func allRuleSpellings() -> Set<String> {
+    Set(rules.indices.map(ruleSpelling))
+  }
+
+}
+
+extension TestBuilder: BNFBuilder {
 
   mutating func makeTerminal<N: EBNFNode>(_ n: N) -> Symbol {
     makeSymbol(n)
@@ -36,6 +49,7 @@ private struct TestBuilder: BNFBuilder {
     rules.append((lhs: lhs, rhs: Array(rhs)))
     ruleLocation.append(source.position)
   }
+
 }
 
 func grammar(_ source: GrammarSource, startSymbol: String = "start") throws
@@ -53,20 +67,105 @@ private func bnf(_ source: GrammarSource, startSymbol: String = "start") throws
   return conversion.output
 }
 
+
 final class BNFConversionTests: XCTestCase {
 
-  func testSimple() throws {
+  /// Called with a multiline string `grammarText` immediately following the open parenthesis
+  /// (`testNoError("""`), converts `grammarText` to BNF via `TestBuilder` and passes the resulting
+  /// `TestBuilder` to `body`, reporting any EBNF errors as test failures.
+  private func testNoError(
+    _ grammarText: String, sourceFilePath: String = #filePath, startLine: Int = #line,
+    body: (TestBuilder) throws -> Void
+  ) throws  {
+    let s = source(grammarText, sourceFilePath: sourceFilePath, startLine: startLine)
     do {
-      let s = source("""
-start ::=
-  'a'
-""")
-      let r = try bnf(s)
-      print(r.rules)
+      try body(bnf(s))
     }
     catch let e as EBNFErrorLog {
       XCTFail("Unexpected error\n\(e.report())")
     }
   }
+
+  func testSimple() throws {
+    try testNoError("""
+start ::=
+  'a'
+""") { g in
+      XCTAssertEqual(g.rules.count, 1)
+      XCTAssertEqual(g.ruleSpelling(0), "start ::= 'a'")
+    }
+  }
+
+  func testKleeneStar() throws {
+    try testNoError("""
+start ::=
+  'a'*
+""") { g in
+      let expected: Set = [
+        "start ::= `'a'*`",
+        "`'a'*` ::= `'a'*` 'a'",
+        "`'a'*` ::= "
+      ]
+      XCTAssertEqual(g.allRuleSpellings(), expected)
+    }
+  }
+
+  func testKleenePlus() throws {
+    try testNoError("""
+start ::=
+  'a'+
+""") { g in
+      let expected: Set = [
+        "start ::= `'a'+`",
+        "`'a'+` ::= `'a'+` 'a'",
+        "`'a'+` ::= 'a'"
+      ]
+      XCTAssertEqual(g.allRuleSpellings(), expected)
+    }
+  }
+
+  func testQuestion() throws {
+    try testNoError("""
+start ::=
+  'a'?
+""") { g in
+      let expected: Set = [
+        "start ::= `'a'?`",
+        "`'a'?` ::= 'a'",
+        "`'a'?` ::= "
+      ]
+      XCTAssertEqual(g.allRuleSpellings(), expected)
+    }
+  }
+
+  func testTopLevelAlternatives() throws {
+    try testNoError("""
+start ::=
+  'a'
+  'b'
+""") { g in
+      let expected: Set = [
+        "start ::= 'a'",
+        "start ::= 'b'"
+      ]
+      XCTAssertEqual(g.allRuleSpellings(), expected)
+    }
+  }
+
+  #if false
+  func testInnerAlternatives() throws {
+    try testNoError("""
+start ::=
+  ('a' | 'b')
+""") { g in
+      let expected: Set = [
+        "start ::= `'a'|'b'`",
+        "`'a'|'b'` ::= 'a'",
+        "`'a'|'b'` ::= 'b'",
+      ]
+      XCTAssertEqual(g.allRuleSpellings(), expected)
+    }
+  }
+  #endif
 
 }
