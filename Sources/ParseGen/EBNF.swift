@@ -225,7 +225,7 @@ public protocol EBNFNode: Hashable {
 extension EBNFNode {
 
   /// A string representation in the original syntax.
-  var dump: String { self.dumped(level: 0) }
+  var dump: String { self.dumped(level: 1) }
 
 }
 
@@ -249,7 +249,7 @@ extension Array: EBNFNode where Element: EBNFNode {
   }
 
   /// A possible generated symbol name for this node in a BNF grammar
-  public var bnfSymbolName: String { dump }
+  public var bnfSymbolName: String { count > 1 ? "`\(dump)`" : dump }
 }
 
 /// An optional `EBNFNode` can itself be used as an `EBNFNode` (representing quantification with

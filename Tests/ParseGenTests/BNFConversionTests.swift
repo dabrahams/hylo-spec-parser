@@ -152,20 +152,18 @@ start ::=
     }
   }
 
-  #if false
   func testInnerAlternatives() throws {
     try testNoError("""
 start ::=
   ('a' | 'b')
 """) { g in
       let expected: Set = [
-        "start ::= `'a'|'b'`",
-        "`'a'|'b'` ::= 'a'",
-        "`'a'|'b'` ::= 'b'",
+        "start ::= `'a' | 'b'`",
+        "`'a' | 'b'` ::= 'a'",
+        "`'a' | 'b'` ::= 'b'",
       ]
       XCTAssertEqual(g.allRuleSpellings(), expected)
     }
   }
-  #endif
 
 }
