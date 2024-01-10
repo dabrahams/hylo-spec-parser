@@ -68,7 +68,7 @@ final class ParseGenTests: XCTestCase {
     #endif
   }
 
-  func testEBNFScanner() throws {
+  func testSpecScanner() throws {
     let specContents = try String(contentsOfFile: specPath, encoding: .utf8)
     let ebnfBlocks = specContents.markdownCodeBlocks(language: "ebnf")
     for b in ebnfBlocks where !b.isEmpty {
@@ -79,7 +79,7 @@ final class ParseGenTests: XCTestCase {
     }
   }
 
-  func testBNFConversion() {
+  func testSpecBNFConversion() {
     do {
       let specContents = try String(contentsOfFile: specPath, encoding: .utf8)
       let g = try specContents.asEBNFGrammar()
@@ -97,7 +97,7 @@ final class ParseGenTests: XCTestCase {
     }
   }
 
-  func testMARPA() {
+  func testSpecMARPA() {
     do {
       let specContents = try String(contentsOfFile: specPath, encoding: .utf8)
       let g = try specContents.asEBNFGrammar()
