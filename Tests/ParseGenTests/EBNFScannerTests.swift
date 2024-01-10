@@ -40,7 +40,7 @@ e ::= (no-implicit-whitespace)
   f g
 
 f ::= (no-newline)
-  f g
+  f | g
 """)
 
   static let sampleTokens = EBNF.tokens(
@@ -65,7 +65,7 @@ f ::= (no-newline)
       (.SYMBOL_NAME, "f"), (.SYMBOL_NAME, "g"), (.EOL, "\n"),
 
       (.LHS, "f"), (.IS_DEFINED_AS, "::="), (.NO_NEWLINE_KIND, "(no-newline)"),
-      (.SYMBOL_NAME, "f"), (.SYMBOL_NAME, "g"), (.EOL, ""),
+      (.SYMBOL_NAME, "f"), (.OR, "|"), (.SYMBOL_NAME, "g"), (.EOL, ""),
     ]
 
     XCTAssertEqual(Self.sampleTokens.count, expected.count)
@@ -94,7 +94,7 @@ e::=(no-implicit-whitespace)
 f          g
 
 f::=(no-newline)
-f g
+f|g
 """)
 
     let tokens1 = EBNF.tokens(

@@ -24,7 +24,7 @@ e ::= (no-implicit-whitespace)
   f g
 
 f ::= (no-newline)
-  f g
+  f | g
 """)
 
 func ebnf(_ source: GrammarSource) throws -> EBNF.DefinitionList {
@@ -95,7 +95,7 @@ final class EBNFParseResultTests: XCTestCase {
       .init(
         kind: .noNewline, lhs: .init("f", at: l),
         alternatives: [
-            [.symbol(.init("f", at: l)), .symbol(.init("g", at: l))]
+          [.group([[.symbol(.init("f", at: l))], [.symbol(.init("g", at: l))]])]
         ])
     ]
 

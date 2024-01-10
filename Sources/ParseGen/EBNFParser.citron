@@ -58,7 +58,7 @@ kind ::= NO_NEWLINE_KIND. { .noNewline }
 rhs_list ::= rhs_line(r). { [r] }
 rhs_list ::= rhs_list(l) rhs_line(r). { l +  [r] }
 
-rhs_line ::= alt(l) EOL. { l }
+rhs_line ::= alt_list(l) EOL. { l.count == 1 ? l[0] : [.group(l)] }
 rhs_line ::= REGEXP(r) EOL. { [.regexp(r.text, position: .init(r.position))] }
 
 literal ::= LITERAL(r). { .literal(String(r.text), position: .init(r.position)) }
