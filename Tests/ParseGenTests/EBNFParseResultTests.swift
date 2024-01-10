@@ -1,0 +1,113 @@
+import XCTest
+@testable import ParseGen
+import CitronLexerModule
+import CitronParserModule
+import Utils
+
+let sampleFile = thisFilePath()
+let sampleStartLine = thisLine() + 2
+private let sample = source("""
+a ::=
+  b c
+
+b ::= (one of)
+  0 ?
+
+c ::= (token)
+  '0b'? d+
+  (x y | q)*
+
+d ::= (regexp)
+  [^']
+
+e ::= (no-implicit-whitespace)
+  f g
+
+f ::= (no-newline)
+  f g
+""")
+
+final class EBNFParseResultTests: XCTestCase {
+
+  func test() throws {
+    let p = EBNFParser()
+    for t in EBNF.tokens(
+          in: sample.text, onLine: sample.startLine, fromFile: sample.sourceFilePath)
+    {
+      try p.consume(token: t, code: t.id)
+    }
+    let ast = try p.endParsing()
+
+    // A dummy source location (they are incidental to AST values)
+    let l = SourceRegion.init(
+      fileName: sampleFile, .init(line: 1, column: 1) ..< .init(line: 1, column: 1))
+    let m = Incidental(l)
+
+    let expected: EBNF.DefinitionList = [
+      .init(
+        kind: .plain, lhs: .init("a", at: l),
+        alternatives: [
+          [.symbol(.init("b", at: l)), .symbol(.init("c", at: l))]]),
+
+      .init(
+        kind: .oneOf, lhs: .init("b", at: l),
+        alternatives: [
+          [.literal("0", position: m)], [.literal("?", position: m)]
+        ]),
+
+      .init(
+        kind: .token, lhs: .init("c", at: l),
+        alternatives: [
+          [
+            .quantified(
+              .literal("0b", position: m), "?", position: m),
+            .quantified(
+              .symbol(.init("d", at: l)), "+", position: m),
+          ],
+          [
+            .quantified(
+              .group(
+                [
+                  [.symbol(.init("x", at: l)), .symbol(.init("y", at: l))],
+                  [.symbol(.init("q", at: l))]
+                ]), "*", position: m)
+          ]
+        ]),
+
+      .init(
+        kind: .regexp, lhs: .init("d", at: l),
+        alternatives: [
+          [
+            .regexp("[^']", position: m)
+          ]
+        ]),
+
+      .init(
+        kind: .noImplicitWhitespace, lhs: .init("e", at: l),
+        alternatives: [
+            [.symbol(.init("f", at: l)), .symbol(.init("g", at: l))]
+        ]),
+
+      .init(
+        kind: .noNewline, lhs: .init("f", at: l),
+        alternatives: [
+            [.symbol(.init("f", at: l)), .symbol(.init("g", at: l))]
+        ])
+    ]
+
+    for (a, x) in zip(ast, expected) {
+      XCTAssertEqual(a.lhs, x.lhs)
+      XCTAssertEqual(a.kind, x.kind)
+      XCTAssertEqual(a.alternatives.count, x.alternatives.count)
+      for (a1, x1) in zip(a.alternatives, x.alternatives) {
+        XCTAssertEqual(a1.count, x1.count)
+        for (a2, x2) in zip(a1, x1) {
+          XCTAssertEqual(a2, x2)
+        }
+        XCTAssertEqual(a1, x1)
+      }
+    }
+    XCTAssertEqual(ast.count, expected.count)
+  }
+
+}
