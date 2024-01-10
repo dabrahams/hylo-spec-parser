@@ -166,4 +166,21 @@ start ::=
     }
   }
 
+  func testCompound() throws {
+    try testNoError("""
+start ::=
+  'b'* ('c' | 'd')
+
+""") { g in
+      let expected: Set = [
+        "start ::= `'b'*` `'c' | 'd'`",
+        "`'b'*` ::= `'b'*` 'b'",
+        "`'b'*` ::= ",
+        "`'c' | 'd'` ::= 'c'",
+        "`'c' | 'd'` ::= 'd'"
+      ]
+      XCTAssertEqual(g.allRuleSpellings(), expected)
+    }
+  }
+
 }
