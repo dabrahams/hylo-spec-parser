@@ -170,7 +170,6 @@ start ::=
     try testNoError("""
 start ::=
   'b'* ('c' | 'd')
-
 """) { g in
       let expected: Set = [
         "start ::= `'b'*` `'c' | 'd'`",
@@ -180,6 +179,47 @@ start ::=
         "`'c' | 'd'` ::= 'd'"
       ]
       XCTAssertEqual(g.allRuleSpellings(), expected)
+    }
+  }
+
+  func testOneOf() throws {
+    try testNoError("""
+start ::= (one of)
+  x y z
+""") { g in
+      let expected: Set = [
+        "start ::= 'x'",
+        "start ::= 'y'",
+        "start ::= 'z'"
+      ]
+      XCTAssertEqual(g.allRuleSpellings(), expected)
+    }
+  }
+
+  func testTokens() throws {
+    try testNoError("""
+start ::=
+  a
+  b c
+
+a ::= (token)
+  'x' b 'z'
+  c
+
+b ::= (one of)
+  x y
+
+c ::= (regexp)
+ ( )*
+""") { g in
+      let expected: Set = [
+        "start ::= a",
+        "start ::= b c",
+        "b ::= 'x'",
+        "b ::= 'y'"
+      ]
+      XCTAssertEqual(g.allRuleSpellings(), expected)
+      XCTAssert(g.symbolName.contains("a"))
     }
   }
 
