@@ -12,7 +12,7 @@ public struct MarpaParser {
   let recognizer: Marpa.Recognizer
 
   /// A symbol outside the input grammar that is generated when no other token can be recognized.
-  let unrecognizedToken: Marpa.Symbol
+  let unrecognizedCharacterToken: Marpa.Symbol
 
   /// A recognizer for the tokens of the input grammar.
   let scanner: CitronLexerModule.Scanner<Marpa.Symbol>
@@ -27,13 +27,13 @@ public struct MarpaParser {
   /// Creates an instance with the given property values.
   init(
     grammar: Marpa.Grammar,
-    unrecognizedToken: Marpa.Symbol,
+    unrecognizedCharacterToken: Marpa.Symbol,
     scanner: Scanner<Marpa.Symbol>,
     symbolName: @escaping (Marpa.Symbol) -> String,
     ruleLocation: @escaping (Marpa.Rule) -> SourceRegion
   ) {
-    (self.grammar, self.unrecognizedToken, self.scanner, self.symbolName, self.ruleLocation)
-      = (grammar, unrecognizedToken, scanner, symbolName, ruleLocation)
+    (self.grammar, self.unrecognizedCharacterToken, self.scanner, self.symbolName, self.ruleLocation)
+      = (grammar, unrecognizedCharacterToken, scanner, symbolName, ruleLocation)
     recognizer = Recognizer(grammar)
   }
 
@@ -71,7 +71,7 @@ public struct MarpaParser {
       = (line: startPosition.line - 1, column: startPosition.column - 1)
 
     let tokens = scanner.tokens(
-      in: String(text), fromFile: sourceFile, unrecognizedToken: unrecognizedToken)
+      in: String(text), fromFile: sourceFile, unrecognizedCharacter: unrecognizedCharacterToken)
 
     var r: [EBNFError.Note] = []
 
@@ -136,7 +136,7 @@ public struct MarpaParser {
     var errors: EBNFErrorLog = []
 
     let tokens = scanner.tokens(
-      in: String(text), fromFile: sourceFile, unrecognizedToken: unrecognizedToken)
+      in: String(text), fromFile: sourceFile, unrecognizedCharacter: unrecognizedCharacterToken)
 
     recognizer.startInput()
 

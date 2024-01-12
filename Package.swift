@@ -20,7 +20,7 @@ let package = Package(
       from: "0.0.0"
     ),
 
-    .package(url: "https://github.com/dabrahams/citron.git", from: "2.1.0"),
+    .package(url: "https://github.com/dabrahams/citron.git", from: "2.1.5"),
     .package(url: "https://github.com/dabrahams/SwiftMarpa.git", from: "0.9.5"),
   ],
 

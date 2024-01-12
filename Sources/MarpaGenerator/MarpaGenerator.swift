@@ -8,7 +8,7 @@ public func makeMarpaParser(_ sourceGrammar: EBNF.Grammar) throws -> MarpaParser
   bnfizer.build()
   let g = bnfizer.output.result
 
-  let unrecognizedToken = g.makeTerminal()
+  let unrecognizedCharacterToken = g.makeTerminal()
 
   // Check the grammar and prepare for use.
   if let err = g.precompute() {
@@ -51,7 +51,7 @@ public func makeMarpaParser(_ sourceGrammar: EBNF.Grammar) throws -> MarpaParser
     })
 
   return MarpaParser(
-    grammar: g, unrecognizedToken: unrecognizedToken,
+    grammar: g, unrecognizedCharacterToken: unrecognizedCharacterToken,
     scanner: Scanner(literalStrings: literals, patterns: tokenPatterns),
     symbolName: name,
     ruleLocation: location)
