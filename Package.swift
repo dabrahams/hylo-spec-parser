@@ -21,7 +21,6 @@ let package = Package(
     ),
 
     .package(url: "https://github.com/dabrahams/citron.git", from: "2.1.5"),
-    .package(url: "https://github.com/dabrahams/SwiftMarpa.git", from: "0.9.5"),
   ],
 
   targets: [
@@ -31,10 +30,6 @@ let package = Package(
       dependencies: [
         .product(name: "LoftDataStructures_Zip2Collection", package: "Zip2Collection")]
     ),
-
-    .target(
-      name: "MarpaGenerator",
-      dependencies: [CitronLexer, "ParseGen", .product(name: "Marpa", package: "SwiftMarpa")]),
 
     .target(
       name: "ParseGen",
@@ -49,5 +44,5 @@ let package = Package(
 
     .testTarget(
       name: "ParseGenTests",
-      dependencies: [CitronLexer, "ParseGen", "Utils", "MarpaGenerator"]),
+      dependencies: [CitronLexer, "ParseGen", "Utils"]),
   ])
