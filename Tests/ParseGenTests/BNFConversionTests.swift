@@ -196,7 +196,7 @@ start ::= (one of)
     }
   }
 
-  func testTokens() throws {
+  func testTokensNotIncludedInBNF() throws {
     try testNoError("""
 start ::=
   a

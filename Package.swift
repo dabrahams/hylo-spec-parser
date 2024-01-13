@@ -39,7 +39,7 @@ let package = Package(
     .target(
       name: "ParseGen",
       dependencies: [
-        "Utils", CitronParser,
+        "Utils", CitronLexer, CitronParser,
         .product(name: "LoftDataStructures_BitVector", package: "BitVector")
       ],
 
