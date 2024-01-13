@@ -20,10 +20,10 @@ c ::= (token)
 d ::= (regexp)
   [^']
 
-e ::= (no-implicit-whitespace)
+e ::=
   f g
 
-f ::= (no-newline)
+f ::=
   f | g
 """)
 
@@ -87,13 +87,13 @@ final class EBNFParseResultTests: XCTestCase {
         ]),
 
       .init(
-        kind: .noImplicitWhitespace, lhs: .init("e", at: l),
+        kind: .plain, lhs: .init("e", at: l),
         alternatives: [
             [.symbol(.init("f", at: l)), .symbol(.init("g", at: l))]
         ]),
 
       .init(
-        kind: .noNewline, lhs: .init("f", at: l),
+        kind: .plain, lhs: .init("f", at: l),
         alternatives: [
           [.group([[.symbol(.init("f", at: l))], [.symbol(.init("g", at: l))]])]
         ])

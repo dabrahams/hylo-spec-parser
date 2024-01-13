@@ -36,10 +36,10 @@ c ::= (token)
 d ::= (regexp)
   [^']
 
-e ::= (no-implicit-whitespace)
+e ::=
   f g
 
-f ::= (no-newline)
+f ::=
   f | g
 """)
 
@@ -61,10 +61,10 @@ f ::= (no-newline)
       (.LHS, "d"), (.IS_DEFINED_AS, "::="), (.REGEXP_KIND, "(regexp)"),
       (.REGEXP, "[^']"), (.EOL, "\n"),
 
-      (.LHS, "e"), (.IS_DEFINED_AS, "::="), (.NO_IMPLICIT_WHITESPACE_KIND, "(no-implicit-whitespace)"),
+      (.LHS, "e"), (.IS_DEFINED_AS, "::="),
       (.SYMBOL_NAME, "f"), (.SYMBOL_NAME, "g"), (.EOL, "\n"),
 
-      (.LHS, "f"), (.IS_DEFINED_AS, "::="), (.NO_NEWLINE_KIND, "(no-newline)"),
+      (.LHS, "f"), (.IS_DEFINED_AS, "::="),
       (.SYMBOL_NAME, "f"), (.OR, "|"), (.SYMBOL_NAME, "g"), (.EOL, ""),
     ]
 
@@ -90,10 +90,10 @@ x   *
     d::=(regexp)
   [^']
 
-e::=(no-implicit-whitespace)
+e::=
 f          g
 
-f::=(no-newline)
+f::=
 f|g
 """)
 

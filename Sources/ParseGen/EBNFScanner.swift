@@ -164,14 +164,6 @@ extension EBNF {
           token(.REGEXP_KIND, t)
           currentDefinitionKind = .regexp
         }
-        else if let t = input.eat("(no-newline)") {
-          token(.NO_NEWLINE_KIND, t)
-          currentDefinitionKind = .noNewline
-        }
-        else if let t = input.eat("(no-implicit-whitespace)") {
-          token(.NO_IMPLICIT_WHITESPACE_KIND, t)
-          currentDefinitionKind = .noImplicitWhitespace
-        }
         else if input.isEmpty {
           return output
         }
@@ -191,7 +183,7 @@ extension EBNF {
             input.skipHorizontalSpace()
           }
 
-        case .plain, .token, .noNewline, .noImplicitWhitespace:
+        case .plain, .token:
           while !input.atEOL {
             if let t = input.eatQuotedLiteral() {
               token(.QUOTED_LITERAL, t)

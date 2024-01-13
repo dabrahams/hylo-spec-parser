@@ -91,7 +91,6 @@ public enum EBNF {
       case token
 
       /// A rule that recognizes one of a fixed number of literal strings.
-      /// Whitespace is not implicitly recognized between elements of a `(token)` rule.
       ///
       /// - For example:
       ///   ```
@@ -109,34 +108,6 @@ public enum EBNF {
       ///     [^`\x0a\x0d]
       ///   ```
       case regexp
-
-      /// A traditional EBNF rule, except that if there is a newline between RHS elements of any
-      /// top-level alternative, recognition fails.
-      ///
-      /// - For example:
-      ///   ```
-      ///   inout-expr ::= (no-newline)
-      ///     '&' expr
-      ///   ```
-      ///   In this case, horizontal whitespace would be allowed between the ampersand and the
-      ///   string matching `expr`, but no vertical whitespace.
-      case noNewline
-
-      /// A traditional EBNF rule, except that implicit whitespace skipping is disabled between RHS
-      /// elements of any top-level alternative
-      ///
-      /// - For example:
-      ///   ```
-      ///   inout-expr ::= (no-implicit-whitespace)
-      ///     '&' horizontal-space? expr
-      ///
-      ///   horizontal-space ::= (regexp)
-      ///     \h
-      ///   ```
-      ///   In this case, horizontal whitespace matching the given regular expression would be
-      ///   allowed between the ampersand and the string matching `expr`, but no other whitespace
-      ///   would be recognized there.
-      case noImplicitWhitespace
     }
 
     /// How this rule should be interpreted.

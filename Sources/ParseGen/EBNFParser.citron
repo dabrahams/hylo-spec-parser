@@ -52,8 +52,6 @@ rule ::= LHS(l) IS_DEFINED_AS ONE_OF_KIND one_of_list(r).
 kind ::= . { .plain }
 kind ::= TOKEN_KIND. { .token }
 kind ::= REGEXP_KIND. { .regexp }
-kind ::= NO_IMPLICIT_WHITESPACE_KIND. { .noImplicitWhitespace }
-kind ::= NO_NEWLINE_KIND. { .noNewline }
 
 rhs_list ::= rhs_line(r). { [r] }
 rhs_list ::= rhs_list(l) rhs_line(r). { l +  [r] }
