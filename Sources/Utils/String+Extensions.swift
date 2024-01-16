@@ -1,5 +1,4 @@
 import Foundation
-import LoftDataStructures_Zip2Collection
 
 extension StringProtocol {
 
