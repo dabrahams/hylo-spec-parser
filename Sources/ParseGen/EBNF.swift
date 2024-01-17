@@ -8,7 +8,27 @@ public enum EBNF {
   struct Token: Equatable {
 
     /// The kind of token; all that matters to the EBNF syntax parser.
-    typealias ID = EBNFParser.CitronTokenCode
+    enum ID: UInt8 {
+      case OR                             =   1
+      case STAR                           =   2
+      case PLUS                           =   3
+      case QUESTION                       =   4
+      case IS_DEFINED_AS                  =   5
+      case ILLEGAL_CHARACTER              =   6
+      case ONE_OF_KIND                    =   7
+      case TOKEN_KIND                     =   8
+      case REGEXP_KIND                    =   9
+      case NO_IMPLICIT_WHITESPACE_KIND    =  10
+      case NO_NEWLINE_KIND                =  11
+      case QUOTED_LITERAL                 =  12
+      case LHS                            =  13
+      case EOL                            =  14
+      case REGEXP                         =  15
+      case LITERAL                        =  16
+      case LPAREN                         =  17
+      case RPAREN                         =  18
+      case SYMBOL_NAME                    =  19
+    }
 
     /// Creates an instance with the given properties.
     ///
@@ -283,6 +303,23 @@ public extension EBNF.Term {
     case .symbol, .literal, .regexp: return s
     default: return "`\(s)`"
     }
+  }
+
+}
+
+public extension EBNF {
+
+  static func parse(
+    sourceText: Substring,
+    onLine startLine: Int,
+    fromFile sourcePath: String
+  ) throws -> DefinitionList {
+    let p = EBNFParser()
+    for t in EBNF.tokens(in: sourceText, onLine: startLine, fromFile: sourcePath)
+    {
+      try p.consume(token: t, code: .init(rawValue: t.id.rawValue)!)
+    }
+    return try p.endParsing()
   }
 
 }

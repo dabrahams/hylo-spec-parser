@@ -27,13 +27,7 @@ f ::=
 """)
 
 func ebnf(_ source: GrammarSource) throws -> EBNF.DefinitionList {
-  let p = EBNFParser()
-  for t in EBNF.tokens(
-        in: source.text, onLine: source.startLine, fromFile: source.sourceFilePath)
-  {
-    try p.consume(token: t, code: t.id)
-  }
-  return try p.endParsing()
+  try EBNF.parse(sourceText: source.text, onLine: source.startLine, fromFile: source.sourceFilePath)
 }
 
 final class EBNFParseResultTests: XCTestCase {
