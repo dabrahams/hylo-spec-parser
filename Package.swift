@@ -1,11 +1,6 @@
 // swift-tools-version:5.9
 import PackageDescription
 
-let CitronParser
-  = Target.Dependency.product(name: "CitronParserModule", package: "citron")
-let CitronLexer
-  = Target.Dependency.product(  name: "CitronLexerModule", package: "citron")
-
 let package = Package(
   name: "HyloSpecParser",
 
@@ -25,7 +20,7 @@ let package = Package(
     .target(
       name: "ParseGen",
       dependencies: [
-        "Utils", CitronLexer, CitronParser, "SourcesAndDiagnostics"
+        "Utils", "SourcesAndDiagnostics", .product(name: "CitronParserModule", package: "citron")
       ],
 
       exclude: ["README.md"],
