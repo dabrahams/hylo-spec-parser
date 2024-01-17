@@ -15,14 +15,17 @@ let package = Package(
 
   targets: [
 
+    .target(name: "Utils"),
     .target(
-      name: "Utils"
-    ),
+      name: "SourcesAndDiagnostics",
+      dependencies: [
+        "Utils"
+      ]),
 
     .target(
       name: "ParseGen",
       dependencies: [
-        "Utils", CitronLexer, CitronParser
+        "Utils", CitronLexer, CitronParser, "SourcesAndDiagnostics"
       ],
 
       exclude: ["README.md"],

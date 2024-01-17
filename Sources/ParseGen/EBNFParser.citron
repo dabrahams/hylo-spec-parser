@@ -2,7 +2,7 @@
 
 %preface {
   import CitronParserModule
-  import CitronLexerModule
+  import SourcesAndDiagnostics
 
   extension _CitronParserUnexpectedTokenError : CustomDebugStringConvertible {
     public var debugDescription: String {

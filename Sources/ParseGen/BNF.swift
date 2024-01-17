@@ -1,4 +1,3 @@
-import CitronLexerModule
 
 extension Collection {
 
@@ -69,7 +68,7 @@ public struct EBNFToBNF<Output: BNFBuilder> {
   ///
   /// - Precondition: `l` was used in the input grammar.
   public func asBNF(literal l: String) -> Output.Symbol {
-    bnfSymbol[.literal(l, position: .init(.empty))]!
+    bnfSymbol[.literal(l, position: .init(.none))]!
   }
 
   /// Returns the `output` symbol corresponding to `s`, creating it if necessary.

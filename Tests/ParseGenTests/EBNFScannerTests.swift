@@ -1,6 +1,7 @@
 @testable // Because CitronTokenCode is internal; see https://github.com/roop/citron/issues/35
 import ParseGen
 import XCTest
+import SourcesAndDiagnostics
 
 /// The EBNF source code for a grammar.
 typealias GrammarSource = (text: Substring, sourceFilePath: String, startLine: Int)
@@ -113,14 +114,31 @@ a ::=
 """)
     // Intentionally lying about the start line.
     let tokens = EBNF.tokens(in: input.text, onLine: 1, fromFile: input.sourceFilePath)
-    XCTAssert(tokens.allSatisfy { $0.position.fileName == thisFilePath() })
-    XCTAssertEqual(
-      tokens[0].position.span, .init(line: 1, column: 1) ..< .init(line: 1, column: 2))
-    XCTAssertEqual(
-      tokens[1].position.span, .init(line: 1, column: 3) ..< .init(line: 1, column: 6))
-    XCTAssertEqual(
-      tokens[2].position.span, .init(line: 2, column: 3) ..< .init(line: 2, column: 4))
-    XCTAssertEqual(
-      tokens[3].position.span, .init(line: 2, column: 5) ..< .init(line: 2, column: 6))
+    XCTAssert(tokens.allSatisfy { $0.position.file.url == URL(fileURLWithPath: thisFilePath()) })
+    XCTAssertEqual(tokens[0].position.lineAndColumn, .init((1, 1)) ..< .init((1, 2)))
+    XCTAssertEqual(tokens[1].position.lineAndColumn, .init((1, 3)) ..< .init((1, 6)))
+    XCTAssertEqual(tokens[2].position.lineAndColumn, .init((2, 3)) ..< .init((2, 4)))
+    XCTAssertEqual(tokens[3].position.lineAndColumn, .init((2, 5)) ..< .init((2, 6)))
   }
+}
+
+struct LineAndColumn: Comparable {
+  let line, column: Int
+
+  init(_ x: (line: Int, column: Int)) {
+    line = x.line
+    column = x.column
+  }
+
+  static func < (l: Self, r: Self) -> Bool {
+    (l.line, l.column) < (r.line, r.column)
+  }
+}
+
+extension SourceRange {
+
+  var lineAndColumn:  Range<LineAndColumn> {
+    .init( file.position(start).lineAndColumn) ..< .init( file.position(end).lineAndColumn)
+  }
+
 }

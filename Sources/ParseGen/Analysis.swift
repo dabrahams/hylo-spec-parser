@@ -1,4 +1,3 @@
-import CitronLexerModule
 import Foundation
 
 extension EBNF.Grammar {

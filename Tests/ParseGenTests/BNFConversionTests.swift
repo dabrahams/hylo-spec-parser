@@ -1,13 +1,14 @@
 import XCTest
-import CitronLexerModule
+import SourcesAndDiagnostics
+
 @testable import ParseGen
 
 private struct TestBuilder {
   typealias Symbol = Int
   var symbolName: [String] = []
-  var symbolLocation: [SourceRegion] = []
+  var symbolLocation: [SourceRange] = []
   var rules: [(lhs: Symbol, rhs: [Symbol])] = []
-  var ruleLocation: [SourceRegion] = []
+  var ruleLocation: [SourceRange] = []
   var startSymbol: Symbol?
 
   func ruleSpelling(_ i: Int) -> String {

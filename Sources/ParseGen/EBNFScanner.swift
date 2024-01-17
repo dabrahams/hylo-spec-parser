@@ -1,4 +1,4 @@
-import CitronLexerModule
+import SourcesAndDiagnostics
 
 /// A mapping from single-character token representations to their ID as consumed by the Citron
 /// parser.
@@ -119,16 +119,13 @@ extension EBNF {
   static func tokens(
     in sourceText: Substring, onLine startLine: Int, fromFile sourcePath: String
   ) -> [Token] {
+    let f = SourceFile(sourceText: sourceText, onLine: startLine, fromFile: sourcePath)
+
     var output: [Token] = []
-    var input = Input(sourceText, onLine: startLine)
+    var input = Input(f.text, onLine: startLine)
 
     func token(_ kind: EBNF.Token.ID, _ text: Substring) {
-      let startColumn = sourceText.distance(from: input.column1, to: text.startIndex) + 1
-
-      let start = SourcePosition(line: input.currentLine, column: startColumn)
-      let end = SourcePosition(line: input.currentLine, column: startColumn + text.count)
-
-      output.append(Token(kind, String(text), at: SourceRegion(fileName: sourcePath, start..<end)))
+      output.append(Token(kind, String(text), at: SourceRange(text.startIndex ..< text.endIndex, in: f)))
     }
 
     func illegalToken() {

@@ -1,4 +1,4 @@
-import CitronLexerModule
+import SourcesAndDiagnostics
 
 /// An error produced when compiling a grammar.
 public struct EBNFError: Error, Hashable {
@@ -10,10 +10,10 @@ public struct EBNFError: Error, Hashable {
     public var message: String
 
     /// Where to point in the source code.
-    public let site: SourceRegion
+    public let site: SourceRange
 
     /// Creates an instance with the given properties.
-    public init(_ message: String, site: SourceRegion) {
+    public init(_ message: String, site: SourceRange) {
       self.message = message
       self.site = site
     }
@@ -23,12 +23,12 @@ public struct EBNFError: Error, Hashable {
   /// A human-readable description of the problem.
   public let message: String
   /// Where to point in the source code
-  public let site: SourceRegion
+  public let site: SourceRange
   /// Any additional notes
   public let notes: [Note]
 
   /// Creates an instance with the given properties.
-  public init(_ message: String, at site: SourceRegion, notes: [Note] = []) {
+  public init(_ message: String, at site: SourceRange, notes: [Note] = []) {
     self.message = message
     self.site = site
     self.notes = notes
@@ -54,7 +54,7 @@ extension EBNFError: CustomStringConvertible {
   }
 
 }
-
+#if false
 public extension SourcePosition {
 
   typealias Offset = (line: Int, column: Int)
@@ -71,7 +71,7 @@ public extension SourcePosition {
 
 }
 
-public extension SourceRegion {
+public extension SourceRange {
 
   /// Returns `l` offset by `r`.
   static func + (l: Self, r: SourcePosition.Offset) -> Self {
@@ -104,6 +104,7 @@ extension EBNFError {
   }
 
 }
+#endif
 
 public typealias EBNFErrorLog = Set<EBNFError>
 
@@ -115,7 +116,7 @@ extension EBNFErrorLog: Error {
 
   /// Returns a string representation suitable for display in an IDE.
   func report() -> String {
-    self.sorted { $0.site.span.lowerBound < $1.site.span.lowerBound }
+    self.sorted { $0.site.start < $1.site.start }
       .lazy.map { "\($0)" }.joined(separator: "\n")
   }
 

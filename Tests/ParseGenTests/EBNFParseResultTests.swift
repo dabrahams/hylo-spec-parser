@@ -1,8 +1,7 @@
 import XCTest
 @testable import ParseGen
-import CitronLexerModule
-import CitronParserModule
 import Utils
+import SourcesAndDiagnostics
 
 let sampleFile = thisFilePath()
 let sampleStartLine = thisLine() + 2
@@ -42,9 +41,7 @@ final class EBNFParseResultTests: XCTestCase {
   func test() throws {
     let ast = try ebnf(sample)
 
-    // A dummy source location (they are incidental to AST values)
-    let l = SourceRegion.init(
-      fileName: sampleFile, .init(line: 1, column: 1) ..< .init(line: 1, column: 1))
+    let l = SourceRange.none
     let m = Incidental(l)
 
     let expected: EBNF.DefinitionList = [

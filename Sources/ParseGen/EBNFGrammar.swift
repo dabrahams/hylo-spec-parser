@@ -35,7 +35,7 @@ extension EBNF.Grammar {
     }
 
     let lhsSymbol: (_: String) throws -> EBNF.Symbol = { [definitionsByLHS] name in
-      if let x = definitionsByLHS[.init(name, at: .empty)] { return x.lhs }
+      if let x = definitionsByLHS[.init(name, at: ast.position)] { return x.lhs }
       errors.insert(
         EBNFError("Symbol \(name) not defined\n\(ast)", at: ast.position))
       throw errors

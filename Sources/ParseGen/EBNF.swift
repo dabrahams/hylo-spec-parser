@@ -1,5 +1,5 @@
-import CitronLexerModule
 import Utils
+import SourcesAndDiagnostics
 
 /// A Namespace for definitions related to our grammar specification syntax.
 public enum EBNF {
@@ -13,7 +13,7 @@ public enum EBNF {
     /// Creates an instance with the given properties.
     ///
     /// - Note: the position of a token is not considered to be part of its value.
-    init(_ id: ID, _ content: String, at position: SourceRegion) {
+    init(_ id: ID, _ content: String, at position: SourceRange) {
       self.id = id
       self.text = content
       self.position_ = .init(position)
@@ -26,10 +26,10 @@ public enum EBNF {
     let text: String
 
     /// The position in the grammar source.
-    let position_: Incidental<SourceRegion>
+    let position_: Incidental<SourceRange>
 
     /// The position in the grammar source (incidental to the value).
-    var position: SourceRegion { position_.value }
+    var position: SourceRange { position_.value }
   }
 
   /// A name in the grammar specification syntax.
@@ -42,7 +42,7 @@ public enum EBNF {
     }
 
     /// Creates an instance with the given properties
-    init(_ content: String, at position: SourceRegion) {
+    init(_ content: String, at position: SourceRange) {
       self.name = content
       self.position_ = .init(position)
     }
@@ -51,10 +51,10 @@ public enum EBNF {
     let name: String
 
     /// The position in the grammar source.
-    let position_: Incidental<SourceRegion>
+    let position_: Incidental<SourceRange>
 
     /// The position in the grammar source (incidental to the value).
-    public var position: SourceRegion { position_.value }
+    public var position: SourceRange { position_.value }
 
     public func dumped(level: Int) -> String { name }
     /// A possible generated symbol name for this node in a BNF grammar
@@ -150,15 +150,15 @@ public enum EBNF {
     case symbol(Symbol)
 
     /// A literal string to be recognized (found at `position` in the grammar source).
-    case literal(String, position: Incidental<SourceRegion>)
+    case literal(String, position: Incidental<SourceRange>)
 
     /// An [ICU regular expression](https://unicode-org.github.io/icu/userguide/strings/regexp.html)
     /// to be matched, (found at `position` in the grammar source).
-    case regexp(String, position: Incidental<SourceRegion>)
+    case regexp(String, position: Incidental<SourceRange>)
 
     /// A term decorated with a `*`, `+`, or `?` quantifier, (found at `position` in the grammar
     /// source).
-    indirect case quantified(Term, Character, position: Incidental<SourceRegion>)
+    indirect case quantified(Term, Character, position: Incidental<SourceRange>)
   }
 }
 
@@ -183,7 +183,7 @@ extension EBNF.Symbol: CustomStringConvertible {
 /// A node in the AST of an EBNF grammar description.
 public protocol EBNFNode: Hashable {
   /// The region of source parsed as this node.
-  var position: SourceRegion { get }
+  var position: SourceRange { get }
 
   /// Returns a string representation in the original syntax, assuming this node appears at the
   /// given `level` of the tree.
@@ -203,8 +203,8 @@ extension EBNFNode {
 /// An array of `EBNFNode`s can itself be used as an `EBNFNode`.
 extension Array: EBNFNode where Element: EBNFNode {
 
-  public var position: SourceRegion {
-    first != nil ? first!.position...last!.position : .empty
+  public var position: SourceRange {
+    first != nil ? first!.position...last!.position : .none
   }
 
   public func dumped(level: Int) -> String {
@@ -227,8 +227,8 @@ extension Array: EBNFNode where Element: EBNFNode {
 /// `?`).
 extension Optional: EBNFNode where Wrapped: EBNFNode {
 
-  public var position: SourceRegion {
-    self?.position ?? .empty
+  public var position: SourceRange {
+    self?.position ?? .none
   }
 
   public func dumped(level: Int) -> String { self?.dumped(level: level + 1) ?? "" }
@@ -240,7 +240,7 @@ extension Optional: EBNFNode where Wrapped: EBNFNode {
 
 extension EBNF.Definition {
 
-  public var position: SourceRegion { lhs.position...alternatives.position }
+  public var position: SourceRange { lhs.position...alternatives.position }
 
   public func dumped(level: Int) -> String {
     let k = [.oneOf: " (one of)", .token: " (token)", .regexp: " (regexp)"][kind]
@@ -256,7 +256,7 @@ extension EBNF.Definition {
 
 public extension EBNF.Term {
 
-  var position: SourceRegion {
+  var position: SourceRange {
     switch self {
     case .group(let g): return g.position
     case .symbol(let s): return s.position
