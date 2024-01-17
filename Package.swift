@@ -3,6 +3,11 @@ import PackageDescription
 
 let package = Package(
   name: "HyloSpecParser",
+    products: [
+        .library(
+            name: "ParserGenerator",
+            targets: ["ParseGen"]),
+    ],
 
   dependencies: [
     .package(url: "https://github.com/dabrahams/citron.git", from: "2.1.5"),
@@ -29,5 +34,5 @@ let package = Package(
 
     .testTarget(
       name: "ParseGenTests",
-      dependencies: ["ParseGen", "Utils"]),
+      dependencies: ["ParserGenerator", "Utils"]),
   ])
