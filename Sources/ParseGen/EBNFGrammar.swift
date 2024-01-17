@@ -23,7 +23,7 @@ extension EBNF.Grammar {
   /// - If any symbols are used that don't appear on the LHS of a rule.
   /// - If any symbols are defined that can't participate in a parse of the start symbol.
   /// - If any `(token)` rules are recursive.
-  init(_ ast: [EBNF.Definition], start startName: String) throws {
+  public init(_ ast: [EBNF.Definition], start startName: String) throws {
     var errors: EBNFErrorLog = []
     definitions = ast
     definitionsByLHS = Dictionary(ast.lazy.map {(key: $0.lhs, value: $0)}) { a, b in

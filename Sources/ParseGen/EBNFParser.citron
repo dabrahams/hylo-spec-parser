@@ -1,17 +1,10 @@
 %class_name EBNFParser
 
 %preface {
+
   import CitronParserModule
   import SourcesAndDiagnostics
 
-  extension _CitronParserUnexpectedTokenError : CustomDebugStringConvertible {
-    public var debugDescription: String {
-      if let t = token as? EBNF.Token {
-        return "\n\(t.position): error: unexpected token (\(t), tokenCode: \(tokenCode))"
-      }
-      return "error: unexpected token (\(token), tokenCode: \(tokenCode))"
-    }
-  }
 }
 
 %nonterminal_type grammar {EBNF.DefinitionList}

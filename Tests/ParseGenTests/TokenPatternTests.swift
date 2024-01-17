@@ -1,5 +1,5 @@
 import XCTest
-@testable import ParseGen
+import ParseGen
 
 final class TokenPatternTests: XCTestCase {
 

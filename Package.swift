@@ -34,5 +34,5 @@ let package = Package(
 
     .testTarget(
       name: "ParseGenTests",
-      dependencies: [CitronLexer, "ParseGen", "Utils"]),
+      dependencies: ["ParseGen", "Utils"]),
   ])

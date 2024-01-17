@@ -116,7 +116,7 @@ private struct Input {
 extension EBNF {
 
   /// Returns the EBNF tokens for `sourceText`, starting on `startLine` of the file at `sourcePath`.
-  static func tokens(
+  public static func tokens(
     in sourceText: Substring, onLine startLine: Int, fromFile sourcePath: String
   ) -> [Token] {
     let f = SourceFile(sourceText: sourceText, onLine: startLine, fromFile: sourcePath)

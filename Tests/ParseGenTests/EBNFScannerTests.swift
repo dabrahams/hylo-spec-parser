@@ -1,4 +1,3 @@
-@testable // Because CitronTokenCode is internal; see https://github.com/roop/citron/issues/35
 import ParseGen
 import XCTest
 import SourcesAndDiagnostics

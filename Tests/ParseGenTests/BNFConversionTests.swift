@@ -1,7 +1,7 @@
 import XCTest
 import SourcesAndDiagnostics
 
-@testable import ParseGen
+import ParseGen
 
 private struct TestBuilder {
   typealias Symbol = Int

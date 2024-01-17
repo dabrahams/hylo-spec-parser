@@ -1,14 +1,15 @@
 import Utils
 import SourcesAndDiagnostics
+import CitronParserModule
 
 /// A Namespace for definitions related to our grammar specification syntax.
 public enum EBNF {
 
   /// A terminal such as `::=` in the grammar specification syntax.
-  struct Token: Equatable {
+  public struct Token: Equatable {
 
     /// The kind of token; all that matters to the EBNF syntax parser.
-    enum ID: UInt8 {
+    public enum ID: UInt8 {
       case OR                             =   1
       case STAR                           =   2
       case PLUS                           =   3
@@ -40,16 +41,16 @@ public enum EBNF {
     }
 
     /// The kind of token; all that matters to the EBNF syntax parser.
-    let id: ID
+    public let id: ID
 
     /// The source text of the token.
-    let text: String
+    public let text: String
 
     /// The position in the grammar source.
     let position_: Incidental<SourceRange>
 
     /// The position in the grammar source (incidental to the value).
-    var position: SourceRange { position_.value }
+    public var position: SourceRange { position_.value }
   }
 
   /// A name in the grammar specification syntax.
@@ -62,13 +63,13 @@ public enum EBNF {
     }
 
     /// Creates an instance with the given properties
-    init(_ content: String, at position: SourceRange) {
+    public init(_ content: String, at position: SourceRange) {
       self.name = content
       self.position_ = .init(position)
     }
 
     /// The text of the name.
-    let name: String
+    public let name: String
 
     /// The position in the grammar source.
     let position_: Incidental<SourceRange>
@@ -93,7 +94,7 @@ public enum EBNF {
   public struct Definition: EBNFNode {
 
     /// How the particular rule is to be interpreted.
-    enum Kind {
+    public enum Kind {
 
       /// A traditional EBNF rule with no special interpretation applied.
       case plain
@@ -131,13 +132,21 @@ public enum EBNF {
     }
 
     /// How this rule should be interpreted.
-    let kind: Kind
+    public let kind: Kind
 
     /// The symbol recognized by this compound rule.
-    let lhs: Symbol
+    public let lhs: Symbol
 
     /// The list of right-hand-side alternatives that derive `lhs`.
-    let alternatives: AlternativeList
+    public let alternatives: AlternativeList
+
+
+    /// An instance with the given properties.
+    public init(kind: Kind, lhs: Symbol, alternatives: AlternativeList) {
+      self.kind = kind
+      self.lhs = lhs
+      self.alternatives = alternatives
+    }
 
     /// A possible generated symbol name for this node in a BNF grammar
     public var bnfSymbolName: String { dump }

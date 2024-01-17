@@ -115,7 +115,7 @@ extension EBNFErrorLog: Error {
   // wrapper around a `Set` to solve that.
 
   /// Returns a string representation suitable for display in an IDE.
-  func report() -> String {
+  public func report() -> String {
     self.sorted { $0.site.start < $1.site.start }
       .lazy.map { "\($0)" }.joined(separator: "\n")
   }
