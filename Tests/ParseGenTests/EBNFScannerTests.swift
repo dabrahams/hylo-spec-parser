@@ -137,7 +137,7 @@ struct LineAndColumn: Comparable {
 extension SourceRange {
 
   var lineAndColumn:  Range<LineAndColumn> {
-    .init( file.position(start).lineAndColumn) ..< .init( file.position(end).lineAndColumn)
+    .init(file.position(startIndex).lineAndColumn) ..< .init( file.position(endIndex).lineAndColumn)
   }
 
 }

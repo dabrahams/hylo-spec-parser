@@ -103,7 +103,7 @@ public final class SourceFile {
   /// - Requires: The bounds of `range` are valid positions in `self`.
   public subscript(_ range: SourceRange) -> Substring {
     precondition(range.file.url == url, "invalid range")
-    return text[range.start ..< range.end]
+    return text[range.startIndex ..< range.endIndex]
   }
 
   /// Returns the position corresponding to `i` in `text`.
