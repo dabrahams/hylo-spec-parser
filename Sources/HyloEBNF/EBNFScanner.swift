@@ -1,5 +1,3 @@
-import SourcesAndDiagnostics
-
 /// A mapping from single-character token representations to their ID as consumed by the Citron
 /// parser.
 let tokenID: [Character: EBNF.Token.ID] = [

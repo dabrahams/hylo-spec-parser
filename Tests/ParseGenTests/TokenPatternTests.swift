@@ -1,5 +1,5 @@
 import XCTest
-import ParseGen
+import HyloEBNF
 
 final class TokenPatternTests: XCTestCase {
 

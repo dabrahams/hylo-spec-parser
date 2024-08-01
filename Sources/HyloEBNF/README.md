@@ -1,4 +1,4 @@
-# ParseGen
+# HyloEBNF
 
 Code for processing the Hylo spec into a grammar and eventually a parser.
 

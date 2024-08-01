@@ -1,5 +1,3 @@
-import Utils
-import SourcesAndDiagnostics
 import CitronParserModule
 
 /// A Namespace for definitions related to our grammar specification syntax.

@@ -1,5 +1,3 @@
-import SourcesAndDiagnostics
-
 /// An error produced when compiling a grammar.
 public struct EBNFError: Error, Hashable {
 

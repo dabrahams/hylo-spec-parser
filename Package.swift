@@ -4,23 +4,22 @@ import PackageDescription
 let package = Package(
   name: "HyloSpecParser",
 
+  products: [
+    .library(
+      name: "HyloEBNF",
+      targets: ["HyloEBNF"]),
+  ],
+
   dependencies: [
     .package(url: "https://github.com/dabrahams/citron.git", from: "2.1.5"),
   ],
 
   targets: [
 
-    .target(name: "Utils"),
     .target(
-      name: "SourcesAndDiagnostics",
+      name: "HyloEBNF",
       dependencies: [
-        "Utils"
-      ]),
-
-    .target(
-      name: "ParseGen",
-      dependencies: [
-        "Utils", "SourcesAndDiagnostics", .product(name: "CitronParserModule", package: "citron")
+        .product(name: "CitronParserModule", package: "citron")
       ],
 
       exclude: ["README.md"],
@@ -28,6 +27,6 @@ let package = Package(
     ),
 
     .testTarget(
-      name: "ParseGenTests",
-      dependencies: ["ParseGen", "Utils"]),
+      name: "HyloEBNFTests",
+      dependencies: ["HyloEBNF"]),
   ])

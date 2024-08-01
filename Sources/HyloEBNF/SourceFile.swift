@@ -1,5 +1,4 @@
 import Foundation
-import Utils
 
 /// A Hylo source file, a synthesized fragment of Hylo source, or a fragment Hylo source embedded
 /// in a Swift string literal.

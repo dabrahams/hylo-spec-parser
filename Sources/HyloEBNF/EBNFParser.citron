@@ -3,7 +3,6 @@
 %preface {
 
   import CitronParserModule
-  import SourcesAndDiagnostics
 
 }
 

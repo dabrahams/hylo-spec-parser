@@ -1,6 +1,5 @@
-import ParseGen
+import HyloEBNF
 import XCTest
-import SourcesAndDiagnostics
 
 /// The EBNF source code for a grammar.
 typealias GrammarSource = (text: Substring, sourceFilePath: String, startLine: Int)

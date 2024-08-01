@@ -1,7 +1,6 @@
 import XCTest
-import SourcesAndDiagnostics
 
-import ParseGen
+import HyloEBNF
 
 private struct TestBuilder {
   typealias Symbol = Int

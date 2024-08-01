@@ -1,7 +1,5 @@
 import XCTest
-import ParseGen
-import Utils
-import SourcesAndDiagnostics
+import HyloEBNF
 
 let sampleFile = thisFilePath()
 let sampleStartLine = thisLine() + 2
